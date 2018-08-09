@@ -95,4 +95,5 @@
 
 
     <string name="NFC_prompt">Please touch sound4all NFC device</string>
+    <string name="NFC_error">NFC Error</string>
 </resources>
