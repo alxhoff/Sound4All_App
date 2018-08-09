@@ -14,13 +14,13 @@ public class TestModel {
         PASS, FAIL
     }
 
-    Integer patient_ID;
-    Integer test_ID;
-    TestType test_type;
-    Ear ear;
-    PassFail pass_fail;
-    String comment;
-    Float duration;
+    private Integer patient_ID;
+    private  Integer test_ID;
+    private TestType test_type;
+    private Ear ear;
+    private PassFail pass_fail;
+    private String comment;
+    private Float duration;
 
     //constructors
     public TestModel(){
