@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">sound4all</string>
+    <string name="action_settings">Settings</string>
+    <string name="patient_form_placeholder">None</string>
+    <string name="patient_form_title">Patient Details</string>
+    <string name="patient_form_familyname">Family Name</string>
+    <string name="patient_form_givenname">Given Name</string>
+    <string name="patient_form_dob_long">Date of Birth</string>
+    <string name="patient_form_dob_date">-</string>
+    <string name="patient_form_dob_prompt">Select Date</string>
+    <string name="date_picker_title">Select Date of Birth</string>
+    <string name="patient_form_weight">Weight</string>
+    <string name="patient_form_height">Height</string>
+    <string name="patient_form_dob">DOB</string>
+    <string name="patient_form_ID">ID</string>
+
+    <string name="patient_form_continue_button">Continue</string>
+    <string name="patient_stored_toast">Patient Stored</string>
+    <string name="patient_updated_toast">Patient Updated</string>
+    <string name="patient_store_failed_toast">Please complete form</string>
+
+    <string name="DB_NAME">SOUND_4_ALL_DB</string>
+    <string name="DB_TABLE">PATIENTS_TABLE</string>
+    <string name="DB_COL_1">ID</string>
+    <string name="DB_COL_2">FAMILY_NAME</string>
+    <string name="DB_COL_3">GIVEN_NAME</string>
+    <string name="DB_COL_4">DOB</string>
+    <string name="DB_COL_5">WEIGHT</string>
+    <string name="DB_COL_6">HEIGHT</string>
+
+    <string name="patient_list_view_title">Patients</string>
+
+    <string-array name="patient_table_cols">
+        <item>ID</item>
+        <item>Family Name</item>
+        <item>Give Name</item>
+    </string-array>
+    
+    <string name="d_test">DPOAE</string>
+    <string name="t_test">TEOAE</string>
+
+    <string name="settings_clear_database">Clear database</string>
+    <string name="settings_clear">Clear</string>
+    <string name="settings_drop_patients_table">Drop patients table</string>
+    <string name="settings_drop_tests_table">Drop tests table</string>
+    <string name="settings_drop">Drop</string>
+    
+    <string name="set_db_sec_title">Databases</string>
+    <string name="set_dpoae_sec_title">DPOAE</string>
+    <string name="set_teoe_sec_title">TEOE</string>
+    
+    <string name="set_teoe_stim_title">Stimulus</string>
+    <string name="set_teoe_stim_opt">Optimized</string>
+    <string name="set_teoe_stim_std">Standard</string>
+
+    <string name="set_teoe_stim_lvl_title">Stimulus level</string>
+    <string name="set_teoe_stim_lvl_60">60</string>
+    <string name="set_teoe_stim_lvl_65">65</string>
+    <string name="set_teoe_stim_lvl_70">70</string>
+    <string name="set_teoe_stim_lvl_75">75</string>
+    <string name="set_teoe_stim_lvl_80">80</string>
+    <string name="set_teoe_stim_lvl_85">85</string>
+
+    <string name="set_teoe_no_pass_title">Number of passes</string>
+    <string name="set_teoe_no_pass_3"><sup>3</sup>/<sub>5</sub></string>
+    <string name="set_teoe_no_pass_4"><sup>4</sup>/<sub>5</sub></string>
+    <string name="set_teoe_no_pass_5"><sup>5</sup>/<sub>5</sub></string>
+
+    <string name="set_teoe_max_dur_title">Maximum duration</string>
+
+    <string-array name="set_teoe_max_dur_spin_vals">
+        <item>15 min</item>
+        <item>30 min</item>
+        <item>45 min</item>
+    </string-array>
+
+    <string name="set_dpoae_f1_title">f<sub>1</sub></string>
+    <string name="set_dpoae_f2_title">f<sub>2</sub></string>
+    <string name="set_dpoae_l1_title">l<sub>1</sub></string>
+    <string name="set_dpoae_l2_title">l<sub>2</sub></string>
+    <string name="set_dpoae_thresh_title">Threshold</string>
+
+    <string name="set_dpoae_frequency_sec_title">Frequency</string>
+    <string name="set_dpoae_frequency_1k">1k</string>
+    <string name="set_dpoae_frequency_1.5k">1.5k</string>
+    <string name="set_dpoae_frequency_2k">2k</string>
+    <string name="set_dpoae_frequency_3k">3k</string>
+    <string name="set_dpoae_frequency_4k">4k</string>
+    <string name="set_dpoae_frequency_5k">5k</string>
+    <string name="set_dpoae_frequency_6k">6k</string>
+    <string name="set_dpoae_frequency_8k">8k</string>
+
+
+    <string name="set_save">Save</string>
+
+
+    <string name="NFC_prompt">Please touch sound4all NFC device</string>
+</resources>

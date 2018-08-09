@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
+        android:gravity="center"
+        android:padding="20dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView6"
+                style="@style/spaced_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/patient_form_familyname" />
+
+            <EditText
+                android:id="@+id/edit_patient_family_name"
+                style="@style/spaced_10"
+                android:background="@drawable/back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/textView9"
+                style="@style/spaced_5"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/patient_form_givenname" />
+
+            <EditText
+                android:id="@+id/edit_patient_given_name"
+                style="@style/spaced_10"
+                android:background="@drawable/back"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/textView8"
+                style="@style/spaced_5"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/patient_form_dob" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/edit_patient_dob"
+                    android:layout_width="117dp"
+                    android:layout_height="34dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/patient_form_dob_date"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <Button
+                    android:id="@+id/edit_patient_dob_button"
+                    style="@style/spaced_10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/patient_form_dob_prompt" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView7"
+                style="@style/spaced_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/patient_form_height" />
+
+            <EditText
+                android:id="@+id/edit_patient_height"
+                style="@style/spaced_10"
+                android:background="@drawable/back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
+
+            <TextView
+                android:id="@+id/textView5"
+                style="@style/spaced_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/patient_form_weight" />
+
+            <EditText
+                android:id="@+id/edit_patient_weight"
+                style="@style/spaced_10"
+                android:background="@drawable/back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
+        </LinearLayout>
+    </ScrollView>
