@@ -48,7 +48,6 @@ public class PatientModel implements Parcelable{
     }
 
     //setters
-
     public static final Creator<PatientModel> CREATOR = new Creator<PatientModel>() {
         @Override
         public PatientModel createFromParcel(Parcel in) {

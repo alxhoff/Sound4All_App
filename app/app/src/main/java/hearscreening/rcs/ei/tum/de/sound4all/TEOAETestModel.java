@@ -1,13 +1,13 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
-public class TPOAETestModel extends TestModel{
+public class TEOAETestModel extends TestModel{
 
     private String file_name;
     private Float duration;
     private Integer stimulation_level;
     private Float maxiimum_duration;
 
-    public TPOAETestModel(){
+    public TEOAETestModel(){
     }
 
     public void setDuration(Float duration) {
@@ -30,15 +30,15 @@ public class TPOAETestModel extends TestModel{
         return duration;
     }
 
-    public Float getMaxiimum_duration() {
+    public Float getMaximumDuration() {
         return maxiimum_duration;
     }
 
-    public Integer getStimulation_level() {
+    public Integer getStimulationLevel() {
         return stimulation_level;
     }
 
-    public String getFile_name() {
+    public String getFileName() {
         return file_name;
     }
 }

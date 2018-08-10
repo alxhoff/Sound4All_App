@@ -68,7 +68,7 @@ public class DPOAETestModel extends TestModel{
         return l2;
     }
 
-    public Float getMaximum_duration() {
+    public Float getMaximumDuration() {
         return maximum_duration;
     }
 

@@ -23,6 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String DP_TESTS_TABLE = "dpoae_tests_table";
     public final static String DP_RESULTS_TABLE = "dpoae_results_table";
     public final static String TE_TESTS_TABLE = "teoae_tests_table";
+    public final static String SETTINGS_TABLE = "settings_table";
 
 
     //***************PATIENTS TABLE****************//
@@ -64,11 +65,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String DP_R_L2 = "DP_RES_L2";
 
 
-    //***************TE TESTS TABLE***************//s
+    //***************TE TESTS TABLE***************//
     //test ID
     public final static String TE_FILE_NAME = "TE_FILE_NAME";
     public final static String TE_DUR = "TE_DUR";
-    public final static String TE_STIM_LVL = "TE_STIM_LVL";
+    public final static String TE_STIMULUS_LVL = "TE_STIM_LVL";
     public final static String TE_MAX_DUR = "TE_MAX_DUR";
 
 
@@ -76,9 +77,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String TEST_ID = "TEST_ID";
 
 
+    //***************SETTINGS TABLE***************//
+    public final static String SET_PRESET = "SETTING_PRESET";
+    public final static String TE_STIMULUS = "TE_STIMULUS";
+    public final static String TE_NO_PASSES = "TE_NUM_OF_PASSES";
+    public final static String DP_FREQ_1K = "DP_FREQ_1K";
+    public final static String DP_FREQ_1K5 = "DP_FREQ_1K5";
+    public final static String DP_FREQ_2K = "DP_FREQ_2K";
+    public final static String DP_FREQ_3K = "DP_FREQ_3K";
+    public final static String DP_FREQ_4K = "DP_FREQ_4K";
+    public final static String DP_FREQ_5K = "DP_FREQ_5K";
+    public final static String DP_FREQ_6K = "DP_FREQ_6K";
+    public final static String DP_FREQ_8K = "DP_FREQ_8K";
+    public final static String DP_R_F1 = "DP_R_F1";
+
+
     //***************PATIENTS TABLE****************//
     private static final String CREATE_TABLE_PATIENTS = "CREATE TABLE IF NOT EXISTS "
-            + PATIENTS_TABLE + " ("
+            + PATIENTS_TABLE + "("
             + PAT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + PAT_FN + " TEXT, "
             + PAT_GN + " TEXT, "
@@ -117,7 +133,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + DP_R_L2 + " INTEGER)";
 
 
-
     //***************TE TESTS TABLE***************//
     private static final String CREATE_TABLE_TE_TESTS = "CREATE TABLE IF NOT EXISTS "
             + TE_TESTS_TABLE + "("
@@ -125,9 +140,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TE_FILE_NAME + " TEXT, "
             + TE_DUR + " REAL, "
             + TE_MAX_DUR + " REAL, "
-            + TE_STIM_LVL + " REAL)";
+            + TE_STIMULUS_LVL + " REAL)";
 
 
+    //***************TE TESTS TABLE***************//
+    private static final String CREATE_TABLE_SETTINGS = "CREATE TABLE IF NOT EXISTS "
+            + SETTINGS_TABLE + "("
+            + SET_PRESET + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + TE_MAX_DUR + " REAL, "
+            + TE_STIMULUS + " STRING, "
+            + TE_NO_PASSES + " INTEGER, "
+            + TE_STIMULUS_LVL + " INTEGER, "
+            + DP_FREQ_1K + " BOOLEAN, "
+            + DP_FREQ_1K5 + " BOOLEAN, "
+            + DP_FREQ_2K + " BOOLEAN, "
+            + DP_FREQ_3K + " BOOLEAN, "
+            + DP_FREQ_4K + " BOOLEAN, "
+            + DP_FREQ_5K + " BOOLEAN, "
+            + DP_FREQ_6K + " BOOLEAN, "
+            + DP_FREQ_8K + " BOOLEAN, "
+            + DP_T_THRESH + " INTEGER, "
+            + DP_R_F1 + " REAL, "
+            + DP_R_F2 + " REAL, "
+            + DP_R_L1 + " REAL, "
+            + DP_R_L2 + " REAL, "
+            + DP_T_MAX_DUR + " REAL)";
+
+    /******************************************************************************
+     **********************************CONSTRUCTORS********************************
+     ******************************************************************************/
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, Version);
         this.context = context;
@@ -140,6 +181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_DP_TESTS);
         db.execSQL(CREATE_TABLE_DP_RESULTS);
         db.execSQL(CREATE_TABLE_TE_TESTS);
+        db.execSQL(CREATE_TABLE_SETTINGS);
     }
 
     @Override
@@ -149,6 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DP_RESULTS_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + DP_TESTS_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + TE_TESTS_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + SETTINGS_TABLE);
         onCreate(db);
     }
 
@@ -181,22 +224,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_DP_TESTS);
         db.execSQL(CREATE_TABLE_DP_RESULTS);
         db.execSQL(CREATE_TABLE_TE_TESTS);
+        db.execSQL(SETTINGS_TABLE);
     }
 
-    //create entries
+    /******************************************************************************
+     ************************************CREATORS**********************************
+     ******************************************************************************/
     public boolean createPatient(String family_name, String given_name, String dob,
                                  Integer weight, Integer height)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-//        String ROWID = generateID(family_name, given_name, dob);
-//        contentValues.put(PAT_ID, ROWID);
         contentValues.put(PAT_FN, family_name);
         contentValues.put(PAT_GN, given_name);
         contentValues.put(PAT_DOB, dob);
         contentValues.put(PAT_HT, height);
         contentValues.put(PAT_WT, weight);
+        long result = db.insert(PATIENTS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean createPatient(PatientModel patient)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PAT_FN, patient.getFamilyName());
+        contentValues.put(PAT_GN, patient.getGivenName());
+        contentValues.put(PAT_DOB, patient.getDob());
+        contentValues.put(PAT_HT, patient.getHeight());
+        contentValues.put(PAT_WT, patient.getWeight());
         long result = db.insert(PATIENTS_TABLE, null, contentValues);
         if(result == -1)
             return false;
@@ -224,8 +285,89 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else return true;
     }
 
-    //fetching
-    //all
+    public boolean createDPOAETest(DPOAETestModel test){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TEST_ID, test.getTest_ID());
+        contentValues.put(DP_T_RATIO, test.getRatio());
+        contentValues.put(DP_T_THRESH, test.getThreshold());
+        contentValues.put(DP_T_MAX_DUR, test.getMaximumDuration());
+        long result = db.insert(DP_TESTS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean createDPOAEResult(DPOAETestModel test){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TEST_ID, test.getTest_ID());
+        contentValues.put(DP_R_NOISE, test.getNoise());
+        contentValues.put(DP_R_LEVEL, test.getDP_level());
+        contentValues.put(DP_R_F2, test.getF2());
+        contentValues.put(DP_R_L1, test.getL1());
+        contentValues.put(DP_R_L2, test.getL2());
+        long result = db.insert(DP_RESULTS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean createTEOAETest(TEOAETestModel test){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TEST_ID, test.getTest_ID());
+        contentValues.put(TE_FILE_NAME, test.getFileName());
+        contentValues.put(TE_DUR, test.getDuration());
+        contentValues.put(TE_STIMULUS_LVL, test.getStimulationLevel());
+        contentValues.put(TE_MAX_DUR, test.getMaximumDuration());
+        long result = db.insert(TE_TESTS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean createSettings(SettingsModel settings){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TE_MAX_DUR, settings.getTE_max_duration());
+        contentValues.put(TE_STIMULUS, String.valueOf(settings.getTE_stimulus()));
+        contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
+        contentValues.put(TE_NO_PASSES, settings.getTE_num_of_passes());
+        contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
+
+        contentValues.put(DP_FREQ_1K, settings.getDP_freq(SettingsModel.DP_FREQS._1K));
+        contentValues.put(DP_FREQ_1K5, settings.getDP_freq(SettingsModel.DP_FREQS._1K5));
+        contentValues.put(DP_FREQ_2K, settings.getDP_freq(SettingsModel.DP_FREQS._2K));
+        contentValues.put(DP_FREQ_3K, settings.getDP_freq(SettingsModel.DP_FREQS._3K));
+        contentValues.put(DP_FREQ_4K, settings.getDP_freq(SettingsModel.DP_FREQS._4K));
+        contentValues.put(DP_FREQ_5K, settings.getDP_freq(SettingsModel.DP_FREQS._5K));
+        contentValues.put(DP_FREQ_6K, settings.getDP_freq(SettingsModel.DP_FREQS._6K));
+        contentValues.put(DP_FREQ_8K, settings.getDP_freq(SettingsModel.DP_FREQS._8K));
+        contentValues.put(DP_T_THRESH, settings.getDP_threshold());
+        contentValues.put(DP_R_F1, settings.getDP_f1());
+        contentValues.put(DP_R_F2, settings.getDP_f2());
+        contentValues.put(DP_R_L1, settings.getDP_l1());
+        contentValues.put(DP_R_L2, settings.getDL_l2());
+        contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
+        long result = db.insert(SETTINGS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+
+    }
+
+    /******************************************************************************
+     ************************************FETCHING**********************************
+     ******************************************************************************/
     public Cursor getAllPatientData(){
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -307,6 +449,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return patients;
     }
 
+
+    /******************************************************************************
+     ************************************UPDATING**********************************
+     ******************************************************************************/
     public void updatePatient(PatientModel patient){
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -322,6 +468,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{patient.getID().toString()});
     }
 
+    public void updateSettings(SettingsModel settings){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TE_MAX_DUR, settings.getTE_max_duration());
+        contentValues.put(TE_STIMULUS, String.valueOf(settings.getTE_stimulus()));
+        contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
+        contentValues.put(TE_NO_PASSES, settings.getTE_num_of_passes());
+        contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
+
+        contentValues.put(DP_FREQ_1K, settings.getDP_freq(SettingsModel.DP_FREQS._1K));
+        contentValues.put(DP_FREQ_1K5, settings.getDP_freq(SettingsModel.DP_FREQS._1K5));
+        contentValues.put(DP_FREQ_2K, settings.getDP_freq(SettingsModel.DP_FREQS._2K));
+        contentValues.put(DP_FREQ_3K, settings.getDP_freq(SettingsModel.DP_FREQS._3K));
+        contentValues.put(DP_FREQ_4K, settings.getDP_freq(SettingsModel.DP_FREQS._4K));
+        contentValues.put(DP_FREQ_5K, settings.getDP_freq(SettingsModel.DP_FREQS._5K));
+        contentValues.put(DP_FREQ_6K, settings.getDP_freq(SettingsModel.DP_FREQS._6K));
+        contentValues.put(DP_FREQ_8K, settings.getDP_freq(SettingsModel.DP_FREQS._8K));
+        contentValues.put(DP_T_THRESH, settings.getDP_threshold());
+        contentValues.put(DP_R_F1, settings.getDP_f1());
+        contentValues.put(DP_R_F2, settings.getDP_f2());
+        contentValues.put(DP_R_L1, settings.getDP_l1());
+        contentValues.put(DP_R_L2, settings.getDL_l2());
+        contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
+
+        db.update(SETTINGS_TABLE, contentValues, SET_PRESET + " =?",
+                new String[]{settings.getPreset_ID().toString()});
+    }
+
+    /******************************************************************************
+     ************************************DROPPING**********************************
+     ******************************************************************************/
     public void removeAllPatients(){
         SQLiteDatabase db = this.getWritableDatabase();
 

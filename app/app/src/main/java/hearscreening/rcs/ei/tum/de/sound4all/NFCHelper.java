@@ -44,13 +44,13 @@ public class NFCHelper {
         }
 
         static {
-            for (RECORD_IDS pageType : RECORD_IDS.values()) {
-                map.put(pageType.value, pageType);
+            for (RECORD_IDS recordId : RECORD_IDS.values()) {
+                map.put(recordId.value, recordId);
             }
         }
 
-        public static RECORD_IDS valueOf(int pageType) {
-            return (RECORD_IDS) map.get(pageType);
+        public static RECORD_IDS valueOf(int recordId) {
+            return (RECORD_IDS) map.get(recordId);
         }
 
         public int getValue() {

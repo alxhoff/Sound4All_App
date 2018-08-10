@@ -38,6 +38,10 @@ public class TestActivity extends AppCompatActivity {
     Button hello;
     Button close;
 
+    TestModel test;
+    DPOAETestModel DPOAEtest;
+    TEOAETestModel TEOAEtest;
+
     PatientModel patient;
     NFCHelper nfcHelper;
 
@@ -67,11 +71,15 @@ public class TestActivity extends AppCompatActivity {
         switch(test_type){
             case 1:
                 getSupportActionBar().setTitle(getResources().getString(R.string.d_test) + " Test");
+                DPOAEtest = new DPOAETestModel();
                 break;
             case 2:
                 getSupportActionBar().setTitle(getResources().getString(R.string.t_test) + " Test");
+                TEOAEtest = new TEOAETestModel();
                 break;
         }
+
+        test = new TestModel();
 
         MyCustomAlertDialog();
     }
