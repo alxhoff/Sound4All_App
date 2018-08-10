@@ -1,12 +1,12 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
 public class PatientModel {
-    Integer ID;
-    String family_name;
-    String given_name;
-    String dob;
-    Integer _height;
-    Integer weight;
+    private Integer ID;
+    private String family_name;
+    private String given_name;
+    private String dob;
+    private Integer _height;
+    private Integer weight;
 
 //constructors
     public PatientModel(){
@@ -76,5 +76,10 @@ public class PatientModel {
 
     public Integer getWeight() {
         return weight;
+    }
+
+    //NFC
+    public void sendPatient(){
+
     }
 }
