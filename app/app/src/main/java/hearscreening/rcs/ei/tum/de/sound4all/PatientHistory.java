@@ -85,6 +85,7 @@ public class PatientHistory extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(PatientHistory.this, TestActivity.class);
+                        intent.putExtra("PATIENT", patient);
                         switch(which){
                             case 0:
                                 //DPOE
@@ -106,14 +107,14 @@ public class PatientHistory extends AppCompatActivity {
         });
 
         tv_name = (TextView) findViewById(R.id.tv_patient_history_name);
-        tv_name.setText(capitalizeWord(patient.getFamily_name()) + ", " +
-                capitalizeWord(patient.given_name));
+        tv_name.setText(capitalizeWord(patient.getFamilyName()) + ", " +
+                capitalizeWord(patient.getGivenName()));
         tv_dob = (TextView) findViewById(R.id.tv_patient_history_DOB);
-        tv_dob.setText(patient.dob);
+        tv_dob.setText(patient.getDob());
         tv_height = (TextView) findViewById(R.id.tv_patient_history_height);
-        tv_height.setText(Integer.toString(patient._height));
+        tv_height.setText(Integer.toString(patient.getHeight()));
         tv_weight = (TextView) findViewById(R.id.tv_patient_history_weight);
-        tv_weight.setText(Integer.toString(patient.weight));
+        tv_weight.setText(Integer.toString(patient.getWeight()));
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
@@ -147,19 +148,19 @@ public class PatientHistory extends AppCompatActivity {
 
         //get views
         final EditText et_family_name = (EditText) dialogLayout.findViewById(R.id.edit_patient_family_name);
-        et_family_name.setText(patient.family_name);
+        et_family_name.setText(patient.getFamilyName());
 
         final EditText et_given_name = (EditText) dialogLayout.findViewById(R.id.edit_patient_given_name);
-        et_given_name.setText(patient.given_name);
+        et_given_name.setText(patient.getGivenName());
 
         final EditText et_height = (EditText) dialogLayout.findViewById(R.id.edit_patient_height);
-        et_height.setText(Integer.toString(patient._height));
+        et_height.setText(Integer.toString(patient.getHeight()));
 
         final EditText et_weight = (EditText) dialogLayout.findViewById(R.id.edit_patient_weight);
-        et_weight.setText(Integer.toString(patient.weight));
+        et_weight.setText(Integer.toString(patient.getWeight()));
 
         final TextView tv_dob = (TextView) dialogLayout.findViewById(R.id.edit_patient_dob);
-        tv_dob.setText(patient.dob);
+        tv_dob.setText(patient.getDob());
 
         //TODO spinner
         Button btn_dob = (Button) dialogLayout.findViewById(R.id.edit_patient_dob_button);
@@ -206,10 +207,10 @@ public class PatientHistory extends AppCompatActivity {
         }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                patient.setFamily_name(et_family_name.getText().toString());
-                patient.setGiven_name(et_given_name.getText().toString());
+                patient.setFamilyName(et_family_name.getText().toString());
+                patient.setGivenName(et_given_name.getText().toString());
                 patient.setDob(tv_dob.getText().toString());
-                patient.set_height(Integer.parseInt(et_height.getText().toString()));
+                patient.setHeight(Integer.parseInt(et_height.getText().toString()));
                 patient.setWeight(Integer.parseInt(et_weight.getText().toString()));
 
                 myDb.updatePatient(patient);

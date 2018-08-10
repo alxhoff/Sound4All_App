@@ -1,6 +1,5 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
-import android.database.Cursor;
 import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -186,7 +185,7 @@ public class PatientListActivity extends AppCompatActivity {
                 tv3.setBackgroundColor(Color.parseColor("#f8f8f8"));
                 tv3.setTextColor(Color.parseColor("#000000"));
                 tv3.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
-                tv3.setText(capitalizeWord(row.getFamily_name()));
+                tv3.setText(capitalizeWord(row.getFamilyName()));
             }
             layPatient.addView(tv3);
 
@@ -201,7 +200,7 @@ public class PatientListActivity extends AppCompatActivity {
                 tv3b.setPadding(5, 1, 0, 5);
                 tv3b.setTextColor(Color.parseColor("#aaaaaa"));
                 tv3b.setBackgroundColor(Color.parseColor("#f8f8f8"));
-                tv3b.setText(capitalizeWord(row.getGiven_name()));
+                tv3b.setText(capitalizeWord(row.getGivenName()));
                 layPatient.addView(tv3b);
             }
 

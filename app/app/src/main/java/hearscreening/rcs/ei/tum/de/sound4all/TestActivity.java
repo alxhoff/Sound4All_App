@@ -38,8 +38,8 @@ public class TestActivity extends AppCompatActivity {
     Button hello;
     Button close;
 
+    PatientModel patient;
     NFCHelper nfcHelper;
-
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD_MR1)
     @Override
@@ -62,6 +62,7 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         Integer test_type = getIntent().getIntExtra("TEST_TYPE", 0);
+        patient = (PatientModel) getIntent().getParcelableExtra("PATIENT");
 
         switch(test_type){
             case 1:
@@ -73,16 +74,23 @@ public class TestActivity extends AppCompatActivity {
         }
 
         MyCustomAlertDialog();
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
+        //tag found
         nfcHelper.readFromIntent(intent);
         if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){
             nfcHelper.nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        }
+        try {
+            patient.sendPatient(this, nfcHelper.nfcTag);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (FormatException e) {
+            e.printStackTrace();
         }
     }
 

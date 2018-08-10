@@ -1,6 +1,46 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
-public class TestModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class TestModel implements Parcelable{
+
+    public static final Creator<TestModel> CREATOR = new Creator<TestModel>() {
+        @Override
+        public TestModel createFromParcel(Parcel in) {
+            return new TestModel(in);
+        }
+
+        @Override
+        public TestModel[] newArray(int size) {
+            return new TestModel[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (patient_ID == null) {
+            dest.writeInt(0);
+        } else {
+            dest.writeInt(patient_ID);
+        }
+        if (test_ID == null) {
+            dest.writeInt(0);
+        } else {
+            dest.writeInt(test_ID);
+        }
+        dest.writeString(comment);
+        if (duration == null) {
+            dest.writeInt(0);
+        } else {
+            dest.writeFloat(duration);
+        }
+    }
 
     public enum TestType {
         DPOAE, TEOAE
@@ -15,7 +55,7 @@ public class TestModel {
     }
 
     private Integer patient_ID;
-    private  Integer test_ID;
+    private Integer test_ID;
     private TestType test_type;
     private Ear ear;
     private PassFail pass_fail;
@@ -24,6 +64,15 @@ public class TestModel {
 
     //constructors
     public TestModel(){
+    }
+
+    public TestModel(Parcel in) {
+        this.patient_ID = in.readInt();
+        this.test_ID = in.readInt();
+        this.test_type = TestType.valueOf(in.readString());
+        this.ear = Ear.valueOf(in.readString());
+        this.pass_fail = PassFail.valueOf(in.readString());
+        this.duration = in.readFloat();
     }
 
     public TestModel(Integer patient_ID){

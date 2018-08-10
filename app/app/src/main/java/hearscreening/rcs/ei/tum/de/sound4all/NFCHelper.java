@@ -28,12 +28,13 @@ import java.util.Map;
 public class NFCHelper {
 
     public enum RECORD_IDS {
-        PATIENT_NAME(1),
-        FAMILY_NAME(2),
-        GIVEN_NAME(3),
-        DOB(4),
-        HEIGHT(5),
-        WEIGHT(6);
+        PATIENT_ID(1),
+        PATIENT_NAME(2),
+        FAMILY_NAME(3),
+        GIVEN_NAME(4),
+        DOB(5),
+        HEIGHT(6),
+        WEIGHT(7);
 
         private byte value;
         private static Map map = new HashMap<>();
@@ -89,43 +90,36 @@ public class NFCHelper {
         }
     }
 
-    public void addRecord(String record_contents, RECORD_IDS record_id){
-        try {
-            this.records.add(createRecord(record_contents, (byte) record_id.getValue()));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+    public void addRecord(String record_contents, RECORD_IDS record_id) throws UnsupportedEncodingException {
+        this.records.add(createRecord(record_contents, (byte) record_id.getValue()));
+
     }
 
     public void clearRecords(){
         records.clear();
     }
 
-    
+
     /******************************************************************************
      *************************************Write************************************
      ******************************************************************************/
-    public void writeMessage(List<NdefRecord> records, Tag tag){
+    public void writeStoredRecords(Tag tag) throws IOException, FormatException {
+        NdefRecord[] final_records = (NdefRecord[]) this.records.toArray(new NdefRecord[0]);
+        NdefMessage message = new NdefMessage(final_records);
+        Ndef ndef = Ndef.get(tag);
+        ndef.connect();
+        ndef.writeNdefMessage(message);
+        ndef.close();
+
+    }
+
+    public void writeMessage(List<NdefRecord> records, Tag tag) throws IOException, FormatException {
         NdefRecord[] final_records = (NdefRecord[]) records.toArray();
         NdefMessage message = new NdefMessage(final_records);
         Ndef ndef = Ndef.get(tag);
-        try {
-            ndef.connect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            ndef.writeNdefMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (FormatException e) {
-            e.printStackTrace();
-        }
-        try {
-            ndef.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ndef.connect();
+        ndef.writeNdefMessage(message);
+        ndef.close();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD_MR1)
@@ -184,7 +178,7 @@ public class NFCHelper {
         int    langLength = langBytes.length;
         int    textLength = textBytes.length;
         byte[] payload    = new byte[1 + langLength + textLength];
-        byte[] id = new byte[0];
+        byte[] id = new byte[1];
         id[0] = ID;
 
         // set status byte (see NDEF spec for actual bits)

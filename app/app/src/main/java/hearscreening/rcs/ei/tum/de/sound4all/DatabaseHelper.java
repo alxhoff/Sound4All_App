@@ -245,12 +245,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if(c != null)
             c.moveToFirst();
 
-        PatientModel tmp_patient = new PatientModel();
+        PatientModel tmp_patient = new PatientModel(this.context);
         tmp_patient.setID(Integer.parseInt(c.getString(c.getColumnIndex(PAT_ID))));
-        tmp_patient.setFamily_name((c.getString(c.getColumnIndex(PAT_FN))));
-        tmp_patient.setGiven_name(c.getString(c.getColumnIndex(PAT_GN)));
+        tmp_patient.setFamilyName((c.getString(c.getColumnIndex(PAT_FN))));
+        tmp_patient.setGivenName(c.getString(c.getColumnIndex(PAT_GN)));
         tmp_patient.setDob(c.getString(c.getColumnIndex(PAT_DOB)));
-        tmp_patient.set_height(c.getInt(c.getColumnIndex(PAT_HT)));
+        tmp_patient.setHeight(c.getInt(c.getColumnIndex(PAT_HT)));
         tmp_patient.setWeight(c.getInt(c.getColumnIndex(PAT_WT)));
 
         return tmp_patient;
@@ -267,12 +267,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if(c != null)
             c.moveToFirst();
 
-        PatientModel tmp_patient = new PatientModel();
+        PatientModel tmp_patient = new PatientModel(this.context);
         tmp_patient.setID(Integer.parseInt(c.getString(c.getColumnIndex(PAT_ID))));
-        tmp_patient.setFamily_name((c.getString(c.getColumnIndex(PAT_FN))));
-        tmp_patient.setGiven_name(c.getString(c.getColumnIndex(PAT_GN)));
+        tmp_patient.setFamilyName((c.getString(c.getColumnIndex(PAT_FN))));
+        tmp_patient.setGivenName(c.getString(c.getColumnIndex(PAT_GN)));
         tmp_patient.setDob(c.getString(c.getColumnIndex(PAT_DOB)));
-        tmp_patient.set_height(c.getInt(c.getColumnIndex(PAT_HT)));
+        tmp_patient.setHeight(c.getInt(c.getColumnIndex(PAT_HT)));
         tmp_patient.setWeight(c.getInt(c.getColumnIndex(PAT_WT)));
 
         return tmp_patient;
@@ -290,16 +290,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         c.moveToFirst();
         for(int i = 0; i < c.getCount(); i++){
-            patients[i] = new PatientModel();
+            patients[i] = new PatientModel(this.context);
 
 //            String test = c.getString(5);
             Integer test_int = c.getCount();
 
             patients[i].setID(Integer.parseInt(c.getString(c.getColumnIndex(PAT_ID))));
-            patients[i].setFamily_name((c.getString(c.getColumnIndex(PAT_FN))));
-            patients[i].setGiven_name(c.getString(c.getColumnIndex(PAT_GN)));
+            patients[i].setFamilyName((c.getString(c.getColumnIndex(PAT_FN))));
+            patients[i].setGivenName(c.getString(c.getColumnIndex(PAT_GN)));
             patients[i].setDob(c.getString(c.getColumnIndex(PAT_DOB)));
-            patients[i].set_height(c.getInt(c.getColumnIndex(PAT_HT)));
+            patients[i].setHeight(c.getInt(c.getColumnIndex(PAT_HT)));
             patients[i].setWeight(c.getInt(c.getColumnIndex(PAT_WT)));
 
             c.moveToNext();
@@ -312,10 +312,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(PAT_ID, patient.getID());
-        values.put(PAT_FN, patient.getFamily_name());
-        values.put(PAT_GN, patient.getGiven_name());
+        values.put(PAT_FN, patient.getFamilyName());
+        values.put(PAT_GN, patient.getGivenName());
         values.put(PAT_DOB, patient.getDob());
-        values.put(PAT_HT, patient.get_height());
+        values.put(PAT_HT, patient.getHeight());
         values.put(PAT_WT, patient.getWeight());
 
         db.update(PATIENTS_TABLE, values, PAT_ID + " =?",
