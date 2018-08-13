@@ -69,10 +69,12 @@
     <string name="set_teoe_max_dur_title">Maximum duration</string>
 
     <string-array name="set_teoe_max_dur_spin_vals">
-        <item>15 min</item>
-        <item>30 min</item>
-        <item>45 min</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
     </string-array>
+
+    <string name="minute_unit">Mins</string>
 
     <string name="set_dpoae_f1_title">f<sub>1</sub></string>
     <string name="set_dpoae_f2_title">f<sub>2</sub></string>
@@ -82,7 +84,7 @@
 
     <string name="set_dpoae_frequency_sec_title">Frequency</string>
     <string name="set_dpoae_frequency_1k">1k</string>
-    <string name="set_dpoae_frequency_1.5k">1.5k</string>
+    <string name="set_dpoae_frequency_1k5">1.5k</string>
     <string name="set_dpoae_frequency_2k">2k</string>
     <string name="set_dpoae_frequency_3k">3k</string>
     <string name="set_dpoae_frequency_4k">4k</string>
@@ -96,4 +98,7 @@
 
     <string name="NFC_prompt">Please touch sound4all NFC device</string>
     <string name="NFC_error">NFC Error</string>
+
+    <string name="preferences_key">s4allsharedPrefsKey</string>
+    <string name="active_settings_preset_key">s4allActiveSetPresetKey</string>
 </resources>

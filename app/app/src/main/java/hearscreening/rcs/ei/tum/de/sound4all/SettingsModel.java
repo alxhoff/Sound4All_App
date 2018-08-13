@@ -1,9 +1,14 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsModel {
+
+    private Context context;
 
     public enum TE_STIMULUS{
         OPTIMIZED, STANDARD
@@ -52,40 +57,48 @@ public class SettingsModel {
     //DPOAE
     private boolean[] DP_freqs;
     private float DP_threshold;
-    private Integer DP_f1;
-    private Integer DP_f2;
-    private Integer DP_l1;
-    private Integer DL_l2;
+    private float DP_f1;
+    private float DP_f2;
+    private float DP_l1;
+    private float DL_l2;
     private float DP_max_duration;
 
-    public SettingsModel(){}
+    //app preferences
+    SharedPreferences sharedPreferences;
+
+    public SettingsModel(Context context){
+        this.DP_freqs = new boolean[8];
+        this.context = context;
+        this.sharedPreferences = context.getSharedPreferences(
+                context.getResources().getString(R.string.preferences_key), Context.MODE_PRIVATE);
+    }
 
     //setters
-    public void setPreset_ID(Integer preset_ID) {
+    public void setPreset_ID(int preset_ID) {
         this.preset_ID = preset_ID;
     }
 
-    public void setDL_l2(Integer DL_l2) {
+    public void setDP_l2(float DL_l2) {
         this.DL_l2 = DL_l2;
     }
 
-    public void setDP_f1(Integer DP_f1) {
+    public void setDP_f1(float DP_f1) {
         this.DP_f1 = DP_f1;
     }
 
-    public void setDP_f2(Integer DP_f2) {
+    public void setDP_f2(float DP_f2) {
         this.DP_f2 = DP_f2;
     }
 
-    public void setDP_freq(Integer index, boolean value){
-        this.DP_freqs[index] = value;
+    public void setDP_freq(int index, int value){
+        this.DP_freqs[index] = (value != 0);
     }
 
     public void setDP_freqs(boolean[] DP_freqs) {
         this.DP_freqs = DP_freqs;
     }
 
-    public void setDP_l1(Integer DP_l1) {
+    public void setDP_l1(float DP_l1) {
         this.DP_l1 = DP_l1;
     }
 
@@ -114,7 +127,7 @@ public class SettingsModel {
     }
 
     //getters
-    public Integer getPreset_ID() {
+    public int getPreset_ID() {
         return preset_ID;
     }
 
@@ -130,19 +143,19 @@ public class SettingsModel {
         return TE_max_duration;
     }
 
-    public Integer getDL_l2() {
+    public float getDP_l2() {
         return DL_l2;
     }
 
-    public Integer getDP_f1() {
+    public float getDP_f1() {
         return DP_f1;
     }
 
-    public Integer getDP_f2() {
+    public float getDP_f2() {
         return DP_f2;
     }
 
-    public Integer getDP_l1() {
+    public float getDP_l1() {
         return DP_l1;
     }
 

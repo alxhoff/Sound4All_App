@@ -1,6 +1,7 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,6 +46,11 @@ public class PatientListActivity extends AppCompatActivity {
         parentLayout.setStretchAllColumns(true);
 
         loadData();
+
+        //settings default added
+        int setting_table_count = myDb.getTableRowCount(DatabaseHelper.SETTINGS_TABLE);
+        if(myDb.getTableRowCount(DatabaseHelper.SETTINGS_TABLE) == 1)
+            myDb.settingsDefaults();
 
         //add patient button
         add_patient_button = (FloatingActionButton) findViewById(R.id.fab_add_patient);

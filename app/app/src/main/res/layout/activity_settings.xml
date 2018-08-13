@@ -66,19 +66,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tv_set_teoe_max_dur_val"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
                         <Spinner
                             android:id="@+id/sp_set_teoe_max_dur"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:entries="@array/set_teoe_max_dur_spin_vals" />
+
+                        <TextView
+                            android:id="@+id/textView10"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/minute_unit" />
                     </LinearLayout>
                 </LinearLayout>
                 <View style="@style/Divider"/>
@@ -138,21 +138,21 @@
                         android:orientation="horizontal">
 
                         <RadioButton
-                            android:id="@+id/rbg_set_teoe_no_pass_3"
+                            android:id="@+id/rb_set_teoe_no_pass_3"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/set_teoe_no_pass_3" />
 
                         <RadioButton
-                            android:id="@+id/rbg_set_teoe_no_pass_4"
+                            android:id="@+id/rb_set_teoe_no_pass_4"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/set_teoe_no_pass_4" />
 
                         <RadioButton
-                            android:id="@+id/rbg_set_teoe_no_pass_5"
+                            android:id="@+id/rb_set_teoe_no_pass_5"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -286,14 +286,14 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/tv_set_dpoae_freq_1.5k"
+                                android:id="@+id/tv_set_dpoae_freq_1k5"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/set_dpoae_frequency_1.5k" />
+                                android:text="@string/set_dpoae_frequency_1k5" />
 
                             <CheckBox
-                                android:id="@+id/cb_set_dpoae_freq_1.5k"
+                                android:id="@+id/cb_set_dpoae_freq_1k5"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1" />
@@ -663,13 +663,6 @@
                         android:layout_weight="1"
                         android:paddingBottom="20dp"
                         android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tv_set_dpoae_max_dur_val"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
                         <Spinner
                             android:id="@+id/sp_set_dpoae_max_dur"
                             android:layout_width="match_parent"
@@ -677,7 +670,12 @@
                             android:layout_weight="1"
                             android:entries="@array/set_teoe_max_dur_spin_vals"
                             />
-
+                        <TextView
+                            android:id="@+id/textView11"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/minute_unit" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

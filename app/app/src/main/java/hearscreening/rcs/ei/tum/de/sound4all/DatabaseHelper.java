@@ -148,7 +148,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + SETTINGS_TABLE + "("
             + SET_PRESET + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + TE_MAX_DUR + " REAL, "
-            + TE_STIMULUS + " STRING, "
+            + TE_STIMULUS + " TEXT, "
             + TE_NO_PASSES + " INTEGER, "
             + TE_STIMULUS_LVL + " INTEGER, "
             + DP_FREQ_1K + " BOOLEAN, "
@@ -195,6 +195,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public boolean settingsDefaults(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(TE_MAX_DUR, 30.0);
+        contentValues.put(TE_STIMULUS, SettingsModel.TE_STIMULUS.STANDARD.name());
+        contentValues.put(TE_STIMULUS_LVL, 60);
+        contentValues.put(TE_NO_PASSES, 3);
+
+        contentValues.put(DP_FREQ_1K, 1);
+        contentValues.put(DP_FREQ_1K5, 1);
+        contentValues.put(DP_FREQ_2K, 1);
+        contentValues.put(DP_FREQ_3K, 1);
+        contentValues.put(DP_FREQ_4K, 1);
+        contentValues.put(DP_FREQ_5K, 1);
+        contentValues.put(DP_FREQ_6K, 1);
+        contentValues.put(DP_FREQ_8K, 1);
+        contentValues.put(DP_T_THRESH, 8);
+        contentValues.put(DP_R_F1, 1);
+        contentValues.put(DP_R_F2, 2);
+        contentValues.put(DP_R_L1, 3);
+        contentValues.put(DP_R_L2, 4);
+        contentValues.put(DP_T_MAX_DUR, 15.0);
+        long result = db.insert(SETTINGS_TABLE, null, contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
+    }
+
+    public int getTableRowCount(String table_name){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String count = "SELECT count(*) FROM " + table_name;
+        Cursor mCursor = db.rawQuery(count, null);
+        return mCursor.getCount();
+    }
+
     private String generateID(String family_name, String given_name, String dob){
         StringBuilder sb = new StringBuilder();
 
@@ -224,7 +261,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_DP_TESTS);
         db.execSQL(CREATE_TABLE_DP_RESULTS);
         db.execSQL(CREATE_TABLE_TE_TESTS);
-        db.execSQL(SETTINGS_TABLE);
+        db.execSQL(CREATE_TABLE_SETTINGS);
     }
 
     /******************************************************************************
@@ -341,7 +378,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TE_STIMULUS, String.valueOf(settings.getTE_stimulus()));
         contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
         contentValues.put(TE_NO_PASSES, settings.getTE_num_of_passes());
-        contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
 
         contentValues.put(DP_FREQ_1K, settings.getDP_freq(SettingsModel.DP_FREQS._1K));
         contentValues.put(DP_FREQ_1K5, settings.getDP_freq(SettingsModel.DP_FREQS._1K5));
@@ -355,7 +391,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_R_F1, settings.getDP_f1());
         contentValues.put(DP_R_F2, settings.getDP_f2());
         contentValues.put(DP_R_L1, settings.getDP_l1());
-        contentValues.put(DP_R_L2, settings.getDL_l2());
+        contentValues.put(DP_R_L2, settings.getDP_l2());
         contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
         long result = db.insert(SETTINGS_TABLE, null, contentValues);
         if(result == -1)
@@ -421,7 +457,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public PatientModel[] getAllPatients(){
-
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + PATIENTS_TABLE;
 
@@ -434,9 +469,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         for(int i = 0; i < c.getCount(); i++){
             patients[i] = new PatientModel(this.context);
 
-//            String test = c.getString(5);
-            Integer test_int = c.getCount();
-
             patients[i].setID(Integer.parseInt(c.getString(c.getColumnIndex(PAT_ID))));
             patients[i].setFamilyName((c.getString(c.getColumnIndex(PAT_FN))));
             patients[i].setGivenName(c.getString(c.getColumnIndex(PAT_GN)));
@@ -446,9 +478,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             c.moveToNext();
         }
+
+        c.close();
         return patients;
     }
 
+    public SettingsModel getSettings(int preset_ID){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + SETTINGS_TABLE + " WHERE " + SET_PRESET + " = " + preset_ID;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        SettingsModel ret_settings = new SettingsModel(this.context);
+
+        if(c != null) {
+            c.moveToFirst();
+
+            ret_settings.setPreset_ID(c.getInt(c.getColumnIndex(SET_PRESET)));
+            ret_settings.setTE_max_duration(c.getFloat(c.getColumnIndex(TE_MAX_DUR)));
+            ret_settings.setTE_stimulus(SettingsModel.TE_STIMULUS.valueOf(c.getString(c.getColumnIndex(TE_STIMULUS))));
+            ret_settings.setTE_num_of_passes(c.getInt(c.getColumnIndex(TE_NO_PASSES)));
+            ret_settings.setTE_stim_lvl(c.getInt(c.getColumnIndex(TE_STIMULUS_LVL)));
+            ret_settings.setDP_freq(0, c.getInt(c.getColumnIndex(DP_FREQ_1K)));
+            ret_settings.setDP_freq(1, c.getInt(c.getColumnIndex(DP_FREQ_1K5)));
+            ret_settings.setDP_freq(2, c.getInt(c.getColumnIndex(DP_FREQ_2K)));
+            ret_settings.setDP_freq(3, c.getInt(c.getColumnIndex(DP_FREQ_3K)));
+            ret_settings.setDP_freq(4, c.getInt(c.getColumnIndex(DP_FREQ_4K)));
+            ret_settings.setDP_freq(5, c.getInt(c.getColumnIndex(DP_FREQ_5K)));
+            ret_settings.setDP_freq(6, c.getInt(c.getColumnIndex(DP_FREQ_6K)));
+            ret_settings.setDP_freq(7, c.getInt(c.getColumnIndex(DP_FREQ_8K)));
+            ret_settings.setDP_threshold(c.getInt(c.getColumnIndex(DP_T_THRESH)));
+            ret_settings.setDP_f1(c.getFloat(c.getColumnIndex(DP_R_F1)));
+            ret_settings.setDP_f2(c.getFloat(c.getColumnIndex(DP_R_F2)));
+            ret_settings.setDP_l1(c.getFloat(c.getColumnIndex(DP_R_L1)));
+            ret_settings.setDP_l2(c.getFloat(c.getColumnIndex(DP_R_L2)));
+            ret_settings.setDP_max_duration(c.getFloat(c.getColumnIndex(DP_T_MAX_DUR)));
+        }
+
+        c.close();
+        return ret_settings;
+    }
 
     /******************************************************************************
      ************************************UPDATING**********************************
@@ -490,11 +561,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_R_F1, settings.getDP_f1());
         contentValues.put(DP_R_F2, settings.getDP_f2());
         contentValues.put(DP_R_L1, settings.getDP_l1());
-        contentValues.put(DP_R_L2, settings.getDL_l2());
+        contentValues.put(DP_R_L2, settings.getDP_l2());
         contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
 
         db.update(SETTINGS_TABLE, contentValues, SET_PRESET + " =?",
-                new String[]{settings.getPreset_ID().toString()});
+                new String[]{Integer.toString(settings.getPreset_ID())});
     }
 
     /******************************************************************************
