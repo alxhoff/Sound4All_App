@@ -42,6 +42,8 @@ public class TestActivity extends AppCompatActivity {
     DPOAETestModel DPOAEtest;
     TEOAETestModel TEOAEtest;
 
+    DatabaseHelper databaseHelper;
+
     PatientModel patient;
     NFCHelper nfcHelper;
 
@@ -50,6 +52,8 @@ public class TestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         nfcHelper = new NFCHelper(TestActivity.this);
+
+        databaseHelper = new DatabaseHelper(this);
 
         nfcHelper.nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if(nfcHelper.nfcAdapter == null){
@@ -90,16 +94,66 @@ public class TestActivity extends AppCompatActivity {
         setIntent(intent);
         //tag found
         nfcHelper.readFromIntent(intent);
-        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){
+        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())){
             nfcHelper.nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            nfcHelper.rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         }
         try {
-            patient.sendPatient(this, nfcHelper.nfcTag);
+            //read device to see if exsisting test exsists that does not exsist in database
+            if(nfcHelper.rawMsgs != null){
+                nfcHelper.msgs = new NdefMessage[nfcHelper.rawMsgs.length];
+                for(int i = 0; i < nfcHelper.rawMsgs.length; i++){
+                    nfcHelper.msgs[i] = (NdefMessage) nfcHelper.rawMsgs[i];
+                }
+                if(checkDifferentPatient(nfcHelper.msgs)){
+                    //new patient
+                    nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
+                }else{
+                    patient.sendPatient(this, nfcHelper.nfcTag);
+                }
+            }
+            //if not send patient data and test config to start new test
+            else{
+                patient.sendPatient(this, nfcHelper.nfcTag);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (FormatException e) {
             e.printStackTrace();
         }
+    }
+//HERE VVVV record id not storing
+    private boolean checkDifferentPatient(NdefMessage[] msgs){
+        for(int i = 0; i < msgs.length; i++){
+            for(int j = 0; j < msgs[i].getRecords().length; j++){
+                byte record_id = 0;
+                record_id = msgs[i].getRecords()[j].getId()[0];
+                if(record_id != 0) {
+                    if (msgs[i].getRecords()[j].getId()[0] == NFCHelper.RECORD_IDS.PATIENT_ID.getValue()) { //ndef contains a patient
+                        byte[] payload = msgs[i].getRecords()[j].getPayload();
+                        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                        int languageCodeLength = payload[0] & 0063;
+                        try {
+                            //check this string length (-2)
+                            String patient_ID_string = new String(payload, languageCodeLength + 1,
+                                    payload.length - languageCodeLength - 2, textEncoding);
+                            //is current patient?
+                            String compare_string = patient.getID().toString();
+                            if (patient_ID_string.equals(patient.getID().toString()))
+                                //new patient
+                                return false;
+                            else
+                                return true;
+                        } catch (UnsupportedEncodingException e) {
+                            Log.e("UnsupportedEncoding", e.toString());
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD_MR1)

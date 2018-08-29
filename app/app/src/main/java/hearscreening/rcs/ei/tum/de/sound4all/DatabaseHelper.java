@@ -434,6 +434,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return tmp_patient;
     }
 
+    public boolean patientExists(String ID){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_ID + " = " + "'"+ID+"'";
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = null;
+
+        try{
+            c = db.rawQuery(selectQuery, null);
+
+            if(c.moveToFirst()){
+                c.close();
+                return true;
+            }else{
+                c.close();
+                return false;
+            }
+        }catch(Exception e){
+            c.close();
+            return false;
+        }
+    }
+
     public PatientModel getPatientByFamilyName(String family_name){
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_FN + " = " + family_name;

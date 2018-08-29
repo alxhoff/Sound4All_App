@@ -78,6 +78,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        getSupportActionBar().setTitle("Settings");
+
         btn_drop_patients = (Button) findViewById(R.id.btn_settings_drop_patients);
         btn_drop_patients.setOnClickListener(new View.OnClickListener() {
             @Override

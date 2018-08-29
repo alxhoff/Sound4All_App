@@ -29,12 +29,11 @@ public class NFCHelper {
 
     public enum RECORD_IDS {
         PATIENT_ID(1),
-        PATIENT_NAME(2),
-        FAMILY_NAME(3),
-        GIVEN_NAME(4),
-        DOB(5),
-        HEIGHT(6),
-        WEIGHT(7);
+        FAMILY_NAME(2),
+        GIVEN_NAME(3),
+        DOB(4),
+        HEIGHT(5),
+        WEIGHT(6);
 
         private byte value;
         private static Map map = new HashMap<>();
@@ -57,9 +56,15 @@ public class NFCHelper {
             return value;
         }
 
+        public void setValue(int value){
+            this.value = (byte) value;
+        }
+
     }
 
     private Context context;
+
+    DatabaseHelper databaseHelper;
 
     //intent interrupt
     PendingIntent pendingIntent;
@@ -67,6 +72,8 @@ public class NFCHelper {
     //device level
     NfcAdapter nfcAdapter;
     Tag nfcTag;
+    Parcelable[] rawMsgs;
+    NdefMessage[] msgs;
     boolean writeMode;
 
     //packet level
@@ -76,6 +83,7 @@ public class NFCHelper {
     public NFCHelper(Context context){
         this.context = context;
         this.records = new ArrayList<NdefRecord>();
+        databaseHelper = new DatabaseHelper(context);
     }
 
     public void addRecord(NdefRecord record){
@@ -92,7 +100,6 @@ public class NFCHelper {
 
     public void addRecord(String record_contents, RECORD_IDS record_id) throws UnsupportedEncodingException {
         this.records.add(createRecord(record_contents, (byte) record_id.getValue()));
-
     }
 
     public void clearRecords(){
@@ -106,10 +113,16 @@ public class NFCHelper {
     public void writeStoredRecords(Tag tag) throws IOException, FormatException {
         NdefRecord[] final_records = (NdefRecord[]) this.records.toArray(new NdefRecord[0]);
         NdefMessage message = new NdefMessage(final_records);
-        Ndef ndef = Ndef.get(tag);
-        ndef.connect();
-        ndef.writeNdefMessage(message);
-        ndef.close();
+        try {
+            Ndef ndef = Ndef.get(tag);
+            if (ndef != null) {
+                ndef.connect();
+                if(!ndef.isWritable())
+                    return;
+                ndef.writeNdefMessage(message);
+                ndef.close();
+            }
+        }catch(Exception e){}
 
     }
 
@@ -177,16 +190,20 @@ public class NFCHelper {
         byte[] langBytes  = lang.getBytes("US-ASCII");
         int    langLength = langBytes.length;
         int    textLength = textBytes.length;
-        byte[] payload    = new byte[1 + langLength + textLength];
         byte[] id = new byte[1];
         id[0] = ID;
+        int idLength = id.length;
+        byte[] payload    = new byte[1 + langLength + textLength + idLength];
 
         // set status byte (see NDEF spec for actual bits)
         payload[0] = (byte) langLength;
+        //set use id flag
+        payload[0] |= (1 << 3);
 
         // copy langbytes and textbytes into payload
         System.arraycopy(langBytes, 0, payload, 1,              langLength);
         System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
+//        System.arraycopy(id, 0, payload, 1 + langLength + textLength, idLength);
 
         NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,  id, payload);
 
@@ -234,6 +251,29 @@ public class NFCHelper {
         Toast.makeText((Activity)this.context, "Contents: " + text, Toast.LENGTH_LONG).show();
     }
 
+    public int getRecordID(NdefRecord record){
+        return Integer.parseInt(String.valueOf(record.getId()));
+    }
+
+    public String getRecordText(NdefRecord record){
+        String return_text = "";
+        if(record != null){
+            byte[] payload = record.getPayload();
+            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
+            int languageCodeLength = payload[0] & 0063; // Get the Language Code, e.g. "en"
+            // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
+            try {
+                // Get the Text
+                return_text = new String(payload, languageCodeLength + 1,
+                        payload.length - languageCodeLength - 1, textEncoding);
+            } catch (UnsupportedEncodingException e) {
+                Log.e("UnsupportedEncoding", e.toString());
+            }
+        }
+
+        return return_text;
+    }
+
     /******************************************************************************
      **********************************Enable Write********************************
      ******************************************************************************/
@@ -250,5 +290,56 @@ public class NFCHelper {
     public void WriteModeOff(){
         writeMode = false;
         nfcAdapter.disableForegroundDispatch((Activity)this.context);
+    }
+
+    /******************************************************************************
+     **********************************Patient*************************************
+     ******************************************************************************/
+    public void storeNewPatient(NdefMessage msg){
+        //construct patient and check they exist in db
+        PatientModel tmp_patient = new PatientModel(this.context);
+        if(msg.getRecords().length > 0){
+            //handle records
+            NFCHelper.RECORD_IDS tmp_id = null;
+            String tmp_value;
+            for(int i = 0; i < msg.getRecords().length; i++){
+                tmp_id.setValue(getRecordID(msg.getRecords()[i]));
+                tmp_value = getRecordText(msg.getRecords()[i]);
+                switch(tmp_id){
+                    case PATIENT_ID:
+                        tmp_patient.setID(tmp_id.getValue());
+                        break;
+                    case FAMILY_NAME:
+                        tmp_patient.setFamilyName(tmp_value);
+                        break;
+                    case GIVEN_NAME:
+                        tmp_patient.setGivenName(tmp_value);
+                        break;
+                    case DOB:
+                        tmp_patient.setDob(tmp_value);
+                        break;
+                    case HEIGHT:
+                        tmp_patient.setHeight(Integer.parseInt(tmp_value));
+                        break;
+                    case WEIGHT:
+                        tmp_patient.setWeight(Integer.parseInt(tmp_value));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            databaseHelper.createPatient(tmp_patient);
+        }
+    }
+
+    /******************************************************************************
+     ***********************************Test***************************************
+     ******************************************************************************/
+    public void storeNewDPOAETest(NdefMessage msg){
+
+    }
+
+    public void soreNewTEOAETest(NdefMessage msg){
+
     }
 }
