@@ -44,9 +44,6 @@ public class SettingsActivity extends AppCompatActivity {
     TextView DP_f1_tv;
     EditText DP_f1_et;
     Button DP_f1_btn;
-    TextView DP_f2_tv;
-    EditText DP_f2_et;
-    Button DP_f2_btn;
     TextView DP_l1_tv;
     EditText DP_l1_et;
     Button DP_l1_btn;
@@ -55,6 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
     Button DP_l2_btn;
     TextView DP_max_dur;
     Spinner DP_max_dur_spin;
+    Spinner DP_SNR_spin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,16 +103,14 @@ public class SettingsActivity extends AppCompatActivity {
         DP_thresh_et = (EditText) findViewById(R.id.et_set_dpoae_thresh_val);
         DP_f1_tv = (TextView) findViewById(R.id.tv_set_dpoae_f1_val);
         DP_f1_et = (EditText) findViewById(R.id.et_set_dpoae_f1_val);
-        DP_f2_tv = (TextView) findViewById(R.id.tv_set_dpoae_f1_val);
-        DP_f2_et = (EditText) findViewById(R.id.et_set_dpoae_f1_val);
         DP_l1_tv = (TextView) findViewById(R.id.tv_set_dpoae_l1_val);
         DP_l1_et = (EditText) findViewById(R.id.et_set_dpoae_l1_val);
         DP_l2_tv = (TextView) findViewById(R.id.tv_set_dpoae_l2_val);
         DP_l2_et = (EditText) findViewById(R.id.et_set_dpoae_l2_val);
         DP_max_dur_spin = (Spinner) findViewById(R.id.sp_set_dpoae_max_dur);
+        DP_SNR_spin = (Spinner) findViewById(R.id.sp_set_dpoae_snr);
         DP_thresh_btn = (Button) findViewById(R.id.btn_set_dpoae_thresh_val);
         DP_f1_btn = (Button) findViewById(R.id.btn_set_dpoae_f1_val);
-        DP_f2_btn = (Button) findViewById(R.id.btn_set_dpoae_f2_val);
         DP_l1_btn = (Button) findViewById(R.id.btn_set_dpoae_l1_val);
         DP_l2_btn = (Button) findViewById(R.id.btn_set_dpoae_l2_val);
 
@@ -142,6 +138,20 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 settingsHelper.settings.setDP_max_duration(Float.parseFloat(selectedItem));
+                settingsHelper.updateSettingPreset();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        DP_SNR_spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                settingsHelper.settings.setDP_SNR(Integer.parseInt(selectedItem));
                 settingsHelper.updateSettingPreset();
             }
 
@@ -277,15 +287,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        DP_f2_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Float setValue = Float.parseFloat(DP_f2_et.getText().toString());
-                settingsHelper.settings.setDP_f2(setValue);
-                settingsHelper.updateSettingPreset();
-            }
-        });
-
         DP_l1_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -318,6 +319,9 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             case 45:
                 TE_max_dur_spin.setSelection(2);
+                break;
+            case 60:
+                TE_max_dur_spin.setSelection(3);
                 break;
             default:
                 TE_max_dur_spin.setSelection(1);
@@ -379,7 +383,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         DP_thresh_tv.setText(Float.toString(settings.getDP_threshold()));
         DP_f1_tv.setText(Float.toString(settings.getDP_f1()));
-        DP_f2_tv.setText(Float.toString(settings.getDP_f2()));
         DP_l1_tv.setText(Float.toString(settings.getDP_l1()));
         DP_l2_tv.setText(Float.toString(settings.getDP_l2()));
 
@@ -393,8 +396,26 @@ public class SettingsActivity extends AppCompatActivity {
             case 45:
                 DP_max_dur_spin.setSelection(2);
                 break;
+            case 60:
+                DP_max_dur_spin.setSelection(3);
+                break;
             default:
                 DP_max_dur_spin.setSelection(1);
+                break;
+        }
+
+        switch((int)settings.getDP_SNR()){
+            case 3:
+                DP_SNR_spin.setSelection(0);
+                break;
+            case 6:
+                DP_SNR_spin.setSelection(1);
+                break;
+            case 9:
+                DP_SNR_spin.setSelection(2);
+                break;
+            case 12:
+                DP_SNR_spin.setSelection(3);
                 break;
         }
     }

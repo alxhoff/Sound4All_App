@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.TableLayout;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -28,18 +27,21 @@ import java.util.Map;
 public class NFCHelper {
 
     public enum RECORD_IDS {
+        NONE(0),
         PATIENT_ID(1),
         FAMILY_NAME(2),
         GIVEN_NAME(3),
         DOB(4),
         HEIGHT(5),
-        WEIGHT(6);
+        WEIGHT(6),
+        TE_CONFIG(7),
+        DP_CONFIG(8);
 
-        private byte value;
+        private int value;
         private static Map map = new HashMap<>();
 
-        private RECORD_IDS(int value) {
-            this.value = (byte) value;
+        RECORD_IDS(int value) {
+            this.value = value;
         }
 
         static {
@@ -48,8 +50,10 @@ public class NFCHelper {
             }
         }
 
+        //enum hashmap not working!
         public static RECORD_IDS valueOf(int recordId) {
-            return (RECORD_IDS) map.get(recordId);
+            RECORD_IDS ret_val = (RECORD_IDS) map.get(recordId);
+            return ret_val;
         }
 
         public int getValue() {
@@ -57,8 +61,12 @@ public class NFCHelper {
         }
 
         public void setValue(int value){
-            this.value = (byte) value;
+            this.value = value;
         }
+//
+//        public void setValue(RECORD_IDS value){
+//            this.value = value;
+//        }
 
     }
 
@@ -194,6 +202,7 @@ public class NFCHelper {
         id[0] = ID;
         int idLength = id.length;
         byte[] payload    = new byte[1 + langLength + textLength + idLength];
+//        byte[] payload    = new byte[1 + langLength + textLength];
 
         // set status byte (see NDEF spec for actual bits)
         payload[0] = (byte) langLength;
@@ -203,7 +212,7 @@ public class NFCHelper {
         // copy langbytes and textbytes into payload
         System.arraycopy(langBytes, 0, payload, 1,              langLength);
         System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
-//        System.arraycopy(id, 0, payload, 1 + langLength + textLength, idLength);
+        System.arraycopy(id, 0, payload, 1 + langLength + textLength, idLength);
 
         NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,  id, payload);
 
@@ -213,46 +222,46 @@ public class NFCHelper {
     /******************************************************************************
      **************************************Read************************************
      ******************************************************************************/
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
-    public void readFromIntent(Intent intent){
-        String action = intent.getAction();
-        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
-                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)){
-            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            NdefMessage[] msgs = null;
-            if(rawMsgs != null){
-                msgs = new NdefMessage[rawMsgs.length];
-                for(int i = 0; i < rawMsgs.length; i++){
-                    msgs[i] = (NdefMessage)rawMsgs[i];
-                }
-            }
-            buildTagViews(msgs);
-        }
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+//    public void readFromIntent(Intent intent){
+//        String action = intent.getAction();
+//        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+//                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+//                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)){
+//            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+//            NdefMessage[] msgs = null;
+//            if(rawMsgs != null){
+//                msgs = new NdefMessage[rawMsgs.length];
+//                for(int i = 0; i < rawMsgs.length; i++){
+//                    msgs[i] = (NdefMessage)rawMsgs[i];
+//                }
+//            }
+//            buildTagViews(msgs);
+//        }
+//    }
+//
+//    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+//    private void buildTagViews(NdefMessage[] msgs) {
+//        if (msgs == null || msgs.length == 0) return;
+//        String text = "";
+////        String tagId = new String(msgs[0].getRecords()[0].getType());
+//        byte[] payload = msgs[0].getRecords()[0].getPayload();
+//        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
+//        int languageCodeLength = payload[0] & 0063; // Get the Language Code, e.g. "en"
+//        // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
+//
+//        try {
+//            // Get the Text
+//            text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
+//        } catch (UnsupportedEncodingException e) {
+//            Log.e("UnsupportedEncoding", e.toString());
+//        }
+//        //handle text here!
+//        Toast.makeText((Activity)this.context, "Contents: " + text, Toast.LENGTH_LONG).show();
+//    }
 
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
-    private void buildTagViews(NdefMessage[] msgs) {
-        if (msgs == null || msgs.length == 0) return;
-        String text = "";
-//        String tagId = new String(msgs[0].getRecords()[0].getType());
-        byte[] payload = msgs[0].getRecords()[0].getPayload();
-        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
-        int languageCodeLength = payload[0] & 0063; // Get the Language Code, e.g. "en"
-        // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
-
-        try {
-            // Get the Text
-            text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
-        } catch (UnsupportedEncodingException e) {
-            Log.e("UnsupportedEncoding", e.toString());
-        }
-        //handle text here!
-        Toast.makeText((Activity)this.context, "Contents: " + text, Toast.LENGTH_LONG).show();
-    }
-
-    public int getRecordID(NdefRecord record){
-        return Integer.parseInt(String.valueOf(record.getId()));
+    public NFCHelper.RECORD_IDS getRecordID(NdefRecord record){
+        return NFCHelper.RECORD_IDS.valueOf(record.getId()[0]);
     }
 
     public String getRecordText(NdefRecord record){
@@ -265,7 +274,7 @@ public class NFCHelper {
             try {
                 // Get the Text
                 return_text = new String(payload, languageCodeLength + 1,
-                        payload.length - languageCodeLength - 1, textEncoding);
+                        payload.length - languageCodeLength - 2, textEncoding);
             } catch (UnsupportedEncodingException e) {
                 Log.e("UnsupportedEncoding", e.toString());
             }
@@ -300,14 +309,18 @@ public class NFCHelper {
         PatientModel tmp_patient = new PatientModel(this.context);
         if(msg.getRecords().length > 0){
             //handle records
-            NFCHelper.RECORD_IDS tmp_id = null;
+            NFCHelper.RECORD_IDS tmp_id = RECORD_IDS.NONE;
             String tmp_value;
+            NdefRecord[] records = msg.getRecords();
+            if(records.length != 0){
+                NFCHelper.RECORD_IDS id_check = getRecordID(records[0]);
+            }
             for(int i = 0; i < msg.getRecords().length; i++){
-                tmp_id.setValue(getRecordID(msg.getRecords()[i]));
+                tmp_id = getRecordID(msg.getRecords()[i]);
                 tmp_value = getRecordText(msg.getRecords()[i]);
                 switch(tmp_id){
                     case PATIENT_ID:
-                        tmp_patient.setID(tmp_id.getValue());
+                        tmp_patient.setID(Integer.parseInt(tmp_value));
                         break;
                     case FAMILY_NAME:
                         tmp_patient.setFamilyName(tmp_value);

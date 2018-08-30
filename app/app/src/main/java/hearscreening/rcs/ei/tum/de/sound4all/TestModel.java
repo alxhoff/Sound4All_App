@@ -1,7 +1,14 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
+import android.content.Context;
+import android.nfc.Tag;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import junit.framework.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestModel implements Parcelable{
 
@@ -43,7 +50,29 @@ public class TestModel implements Parcelable{
     }
 
     public enum TestType {
-        DPOAE, TEOAE
+        DPOAE(1),
+        TEOAE(2);
+
+        private int value;
+        private static Map map = new HashMap<>();
+
+        TestType(int value){
+            this.value = value;
+        }
+
+        static{
+            for(TestType testType : TestType.values()){
+                map.put(testType.value, testType);
+            }
+        }
+
+        public static TestType valueOf(int testType){
+            return (TestType) map.get(testType);
+        }
+
+        public int getTestType(){
+            return value;
+        }
     }
 
     public enum Ear{
@@ -134,7 +163,7 @@ public class TestModel implements Parcelable{
     }
 
     public TestType getTest_type() {
-        return test_type;
+        return TestType.valueOf(test_type.value);
     }
 
     public Ear getEar() {
@@ -151,5 +180,9 @@ public class TestModel implements Parcelable{
 
     public Float getDuration() {
         return duration;
+    }
+
+    public void sendTest(Context context, Tag tag){
+
     }
 }

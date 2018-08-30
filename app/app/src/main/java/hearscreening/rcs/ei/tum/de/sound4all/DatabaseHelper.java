@@ -90,6 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String DP_FREQ_6K = "DP_FREQ_6K";
     public final static String DP_FREQ_8K = "DP_FREQ_8K";
     public final static String DP_R_F1 = "DP_R_F1";
+    public final static String DP_T_SNR = "DP_TEST_SNR";
 
 
     //***************PATIENTS TABLE****************//
@@ -164,7 +165,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + DP_R_F2 + " REAL, "
             + DP_R_L1 + " REAL, "
             + DP_R_L2 + " REAL, "
-            + DP_T_MAX_DUR + " REAL)";
+            + DP_T_MAX_DUR + " REAL, "
+            + DP_T_SNR + " INTEGER)";
 
     /******************************************************************************
      **********************************CONSTRUCTORS********************************
@@ -218,6 +220,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_R_L1, 3);
         contentValues.put(DP_R_L2, 4);
         contentValues.put(DP_T_MAX_DUR, 15.0);
+        contentValues.put(DP_T_SNR, 3);
         long result = db.insert(SETTINGS_TABLE, null, contentValues);
         if(result == -1)
             return false;
@@ -393,6 +396,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_R_L1, settings.getDP_l1());
         contentValues.put(DP_R_L2, settings.getDP_l2());
         contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
+        contentValues.put(DP_T_SNR, settings.getDP_SNR());
         long result = db.insert(SETTINGS_TABLE, null, contentValues);
         if(result == -1)
             return false;
@@ -540,6 +544,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ret_settings.setDP_l1(c.getFloat(c.getColumnIndex(DP_R_L1)));
             ret_settings.setDP_l2(c.getFloat(c.getColumnIndex(DP_R_L2)));
             ret_settings.setDP_max_duration(c.getFloat(c.getColumnIndex(DP_T_MAX_DUR)));
+            ret_settings.setDP_SNR(c.getInt(c.getColumnIndex(DP_T_SNR)));
         }
 
         c.close();
@@ -584,10 +589,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_FREQ_8K, settings.getDP_freq(SettingsModel.DP_FREQS._8K));
         contentValues.put(DP_T_THRESH, settings.getDP_threshold());
         contentValues.put(DP_R_F1, settings.getDP_f1());
-        contentValues.put(DP_R_F2, settings.getDP_f2());
         contentValues.put(DP_R_L1, settings.getDP_l1());
         contentValues.put(DP_R_L2, settings.getDP_l2());
         contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
+        int test_SNR = settings.getDP_SNR();
+        contentValues.put(DP_T_SNR, settings.getDP_SNR());
 
         db.update(SETTINGS_TABLE, contentValues, SET_PRESET + " =?",
                 new String[]{Integer.toString(settings.getPreset_ID())});

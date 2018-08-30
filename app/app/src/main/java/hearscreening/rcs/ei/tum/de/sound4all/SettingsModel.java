@@ -2,6 +2,7 @@ package hearscreening.rcs.ei.tum.de.sound4all;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,34 @@ public class SettingsModel {
 
     public enum TE_STIMULUS{
         OPTIMIZED, STANDARD
+    }
+
+    public enum SNR_dBs{
+        _3(3),
+        _6(6),
+        _9(9),
+        _12(12);
+
+        private int value;
+        private static Map map = new HashMap<>();
+
+        SNR_dBs(int value){
+            this.value = value;
+        }
+
+        static{
+            for(SettingsModel.SNR_dBs dBIndex : SettingsModel.SNR_dBs.values()){
+                map.put(dBIndex.value, dBIndex);
+            }
+        }
+
+        public static SettingsModel.SNR_dBs valueOf(int dBIndex) {
+            return (SettingsModel.SNR_dBs) map.get(dBIndex);
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 
     public enum DP_FREQS{
@@ -27,7 +56,7 @@ public class SettingsModel {
         private int value;
         private static Map map = new HashMap<>();
 
-        private DP_FREQS(int value) {
+        DP_FREQS(int value) {
             this.value = value;
         }
 
@@ -56,6 +85,7 @@ public class SettingsModel {
 
     //DPOAE
     private boolean[] DP_freqs;
+    private SNR_dBs DP_SNR;
     private float DP_threshold;
     private float DP_f1;
     private float DP_f2;
@@ -63,11 +93,16 @@ public class SettingsModel {
     private float DL_l2;
     private float DP_max_duration;
 
+    //compiled config bits
+    // | 8 bit: max dur(sec) | 1 bit: Stimulus- 1=optimized, 0=standard | \
+    // |3 bit: stim level- 60=1, 65=2, 70=3. 75=4, 80=5, 85=6
+
     //app preferences
     SharedPreferences sharedPreferences;
 
     public SettingsModel(Context context){
         this.DP_freqs = new boolean[8];
+        this.DP_SNR = SNR_dBs._3;
         this.context = context;
         this.sharedPreferences = context.getSharedPreferences(
                 context.getResources().getString(R.string.preferences_key), Context.MODE_PRIVATE);
@@ -96,6 +131,10 @@ public class SettingsModel {
 
     public void setDP_freqs(boolean[] DP_freqs) {
         this.DP_freqs = DP_freqs;
+    }
+
+    public void setDP_SNR(int DP_SNR) {
+        this.DP_SNR.value = DP_SNR;
     }
 
     public void setDP_l1(float DP_l1) {
@@ -171,12 +210,31 @@ public class SettingsModel {
         return DP_freqs;
     }
 
+    public int getDP_SNR() {
+        return DP_SNR.value;
+    }
+
     public boolean getDP_freq(DP_FREQS index){
         return DP_freqs[index.getValue()];
     }
 
     public TE_STIMULUS getTE_stimulus() {
         return TE_stimulus;
+    }
+
+    public void sendConfig(Context context, Tag tag, TestModel.TestType testType){
+        NFCHelper nfcHelper = new NFCHelper(context);
+
+        switch(testType){
+            case DPOAE:
+
+                break;
+            case TEOAE:
+                //compile data
+                break;
+            default:
+                break;
+        }
     }
 }
 

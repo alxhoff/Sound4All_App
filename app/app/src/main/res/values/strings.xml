@@ -72,9 +72,18 @@
         <item>15</item>
         <item>30</item>
         <item>45</item>
+        <item>60</item>
     </string-array>
 
-    <string name="minute_unit">Mins</string>
+    <string-array name="set_dpoae_snr_spin_vals">
+        <item>3</item>
+        <item>6</item>
+        <item>9</item>
+        <item>12</item>
+    </string-array>
+
+    <string name="second_unit">Sec</string>
+    <string name="db_unit">dB</string>
 
     <string name="set_dpoae_f1_title">f<sub>1</sub></string>
     <string name="set_dpoae_f2_title">f<sub>2</sub></string>
@@ -92,6 +101,7 @@
     <string name="set_dpoae_frequency_6k">6k</string>
     <string name="set_dpoae_frequency_8k">8k</string>
 
+    <string name="set_dpoae_snr_title">SNR</string>
 
     <string name="set_save">Save</string>
 

@@ -78,7 +78,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/minute_unit" />
+                            android:text="@string/second_unit" />
                     </LinearLayout>
                 </LinearLayout>
                 <View style="@style/Divider"/>
@@ -512,50 +512,6 @@
                 </LinearLayout>
                 <View style="@style/Divider"/>
                 <LinearLayout
-                    android:id="@+id/ll_set_dpoae_f2_sec"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingBottom="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_set_dpoae_f2_sec_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="@string/set_dpoae_f2_title" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tv_set_dpoae_f2_val"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <EditText
-                            android:id="@+id/et_set_dpoae_f2_val"
-                            android:background="@drawable/back"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:ems="10"
-                            android:inputType="number" />
-
-                        <Button
-                            android:id="@+id/btn_set_dpoae_f2_val"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/set_save" />
-
-                    </LinearLayout>
-                </LinearLayout>
-                <View style="@style/Divider"/>
-                <LinearLayout
                     android:id="@+id/ll_set_dpoae_l1_sec"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -675,7 +631,43 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="@string/minute_unit" />
+                            android:text="@string/second_unit" />
+                    </LinearLayout>
+                </LinearLayout>
+                <View style="@style/Divider"/>
+                <LinearLayout
+                    android:id="@+id/ll_set_dpoae_snr"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_set_dpoae_snr_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:text="@string/set_dpoae_snr_title" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:paddingBottom="20dp"
+                        android:orientation="horizontal">
+                        <Spinner
+                            android:id="@+id/sp_set_dpoae_snr"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:entries="@array/set_dpoae_snr_spin_vals"
+                            />
+                        <TextView
+                            android:id="@+id/textView133"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/db_unit" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.NotDirectoryException;
 
+import hearscreening.rcs.ei.tum.de.sound4all.TestModel.TestType;
+
 public class TestActivity extends AppCompatActivity {
 
     Dialog MyDialog;
@@ -75,10 +77,12 @@ public class TestActivity extends AppCompatActivity {
         switch(test_type){
             case 1:
                 getSupportActionBar().setTitle(getResources().getString(R.string.d_test) + " Test");
+                test.setTest_type(TestType.DPOAE);
                 DPOAEtest = new DPOAETestModel();
                 break;
             case 2:
                 getSupportActionBar().setTitle(getResources().getString(R.string.t_test) + " Test");
+                test.setTest_type(TestType.TEOAE);
                 TEOAEtest = new TEOAETestModel();
                 break;
         }
@@ -93,7 +97,7 @@ public class TestActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
         //tag found
-        nfcHelper.readFromIntent(intent);
+//        nfcHelper.readFromIntent(intent);
         if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())
                 || NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())
                 || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())){
@@ -107,16 +111,30 @@ public class TestActivity extends AppCompatActivity {
                 for(int i = 0; i < nfcHelper.rawMsgs.length; i++){
                     nfcHelper.msgs[i] = (NdefMessage) nfcHelper.rawMsgs[i];
                 }
-                if(checkDifferentPatient(nfcHelper.msgs)){
-                    //new patient
-                    nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
-                }else{
-                    patient.sendPatient(this, nfcHelper.nfcTag);
-                }
+                //TODO add checking test against DB to check
+//                if(checkDifferentPatient(nfcHelper.msgs)){
+//                    //new patient
+//                    //check patient exsists
+//                    nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
+//                }else{
+//                    patient.sendPatient(this, nfcHelper.nfcTag);
+//                }
+                patient.sendPatient(this, nfcHelper.nfcTag);
             }
             //if not send patient data and test config to start new test
             else{
                 patient.sendPatient(this, nfcHelper.nfcTag);
+            }
+            //send test config
+            TestModel.TestType test_type = test.getTest_type();
+            switch(test_type){
+                case DPOAE:
+
+                    break;
+                case TEOAE:
+                    break;
+                default:
+                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -124,7 +142,7 @@ public class TestActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-//HERE VVVV record id not storing
+
     private boolean checkDifferentPatient(NdefMessage[] msgs){
         for(int i = 0; i < msgs.length; i++){
             for(int j = 0; j < msgs[i].getRecords().length; j++){
