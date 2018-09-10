@@ -469,7 +469,8 @@ public class SettingsActivity extends AppCompatActivity {
             final RadioButton[] rb_gt4 = new RadioButton[3];
             for(int i=(freqs_checked-2); i<=freqs_checked; i++){
                 rb_gt4[i - freqs_checked + 2]  = new RadioButton(this);
-                rb_gt4[i - freqs_checked + 2].setLayoutParams(new RadioGroup.LayoutParams(
+//                if(i == freqs_checked - 2) rb_gt4[i - freqs_checked + 2].setChecked(true);
+                    rb_gt4[i - freqs_checked + 2].setLayoutParams(new RadioGroup.LayoutParams(
                         RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT));
                 rg.addView(rb_gt4[i - freqs_checked + 2]);
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
@@ -479,12 +480,14 @@ public class SettingsActivity extends AppCompatActivity {
             final RadioButton[] rb_3o2 = new RadioButton[2];
             for(int i=(freqs_checked-1); i<=freqs_checked; i++){
                 rb_3o2[i - freqs_checked + 1]  = new RadioButton(this);
+//                if(i == freqs_checked - 1) rb_3o2[i - freqs_checked + 2].setChecked(true);
                 rg.addView(rb_3o2[i - freqs_checked + 1]);
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
                 rb_3o2[i - freqs_checked + 1].setText(Html.fromHtml(text));
             }
         }else if(freqs_checked == 1){
             final RadioButton rb_1 = new RadioButton(this);
+//            rb_1.setChecked(true);
             rg.addView(rb_1);
             String text = String.format("<sup>%d</sup>/<sub>%d</sub>", 1, freqs_checked);
             rb_1.setText(Html.fromHtml(text));
@@ -493,6 +496,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         }else{
             DP_num_passes.removeAllViews();
+            ((RadioButton)rg.getChildAt(0)).setChecked(true);
             DP_num_passes.addView(rg);
         }
     }
