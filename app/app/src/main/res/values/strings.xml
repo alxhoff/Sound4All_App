@@ -62,6 +62,7 @@
     <string name="set_teoe_stim_lvl_85">85</string>
 
     <string name="set_teoe_no_pass_title">Number of passes</string>
+    <string name="set_dpoae_no_pass_title">Number of passes</string>
     <string name="set_teoe_no_pass_3"><sup>3</sup>/<sub>5</sub></string>
     <string name="set_teoe_no_pass_4"><sup>4</sup>/<sub>5</sub></string>
     <string name="set_teoe_no_pass_5"><sup>5</sup>/<sub>5</sub></string>

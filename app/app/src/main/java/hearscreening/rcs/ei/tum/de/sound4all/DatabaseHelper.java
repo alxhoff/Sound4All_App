@@ -592,7 +592,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_R_L1, settings.getDP_l1());
         contentValues.put(DP_R_L2, settings.getDP_l2());
         contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
-        int test_SNR = settings.getDP_SNR();
         contentValues.put(DP_T_SNR, settings.getDP_SNR());
 
         db.update(SETTINGS_TABLE, contentValues, SET_PRESET + " =?",

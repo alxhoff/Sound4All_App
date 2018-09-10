@@ -127,6 +127,9 @@ public class TestActivity extends AppCompatActivity {
             }
             //send test config
             TestModel.TestType test_type = test.getTest_type();
+            //compile active settings
+            SettingsHelper settingsHelper = new SettingsHelper(this);
+            settingsHelper.compileSettings();
             switch(test_type){
                 case DPOAE:
 

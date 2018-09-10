@@ -137,26 +137,26 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <RadioButton
-                            android:id="@+id/rb_set_teoe_no_pass_3"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/set_teoe_no_pass_3" />
+                        <!--<RadioButton-->
+                            <!--android:id="@+id/rb_set_teoe_no_pass_3"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:text="@string/set_teoe_no_pass_3" />-->
 
-                        <RadioButton
-                            android:id="@+id/rb_set_teoe_no_pass_4"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/set_teoe_no_pass_4" />
+                        <!--<RadioButton-->
+                            <!--android:id="@+id/rb_set_teoe_no_pass_4"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:text="@string/set_teoe_no_pass_4" />-->
 
-                        <RadioButton
-                            android:id="@+id/rb_set_teoe_no_pass_5"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/set_teoe_no_pass_5" />
+                        <!--<RadioButton-->
+                            <!--android:id="@+id/rb_set_teoe_no_pass_5"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:text="@string/set_teoe_no_pass_5" />-->
 
                     </RadioGroup>
                 </LinearLayout>
@@ -241,6 +241,49 @@
                     android:padding="20dp"
                     android:text="@string/set_dpoae_sec_title" />
                 <View style="@style/Divider"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_sec_dpoae_no_pass_sec"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_set_dpoae_no_pass_sec_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="@string/set_teoe_no_pass_title" />
+
+                    <RadioGroup
+                        android:id="@+id/rbg_set_dpoae_no_pass"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!--<RadioButton-->
+                        <!--android:id="@+id/rb_set_teoe_no_pass_3"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:text="@string/set_teoe_no_pass_3" />-->
+
+                        <!--<RadioButton-->
+                        <!--android:id="@+id/rb_set_teoe_no_pass_4"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:text="@string/set_teoe_no_pass_4" />-->
+
+                        <!--<RadioButton-->
+                        <!--android:id="@+id/rb_set_teoe_no_pass_5"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:text="@string/set_teoe_no_pass_5" />-->
+
+                    </RadioGroup>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

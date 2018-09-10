@@ -3,17 +3,24 @@ package hearscreening.rcs.ei.tum.de.sound4all;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -28,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
     Spinner TE_max_dur_spin;
     RadioGroup TE_stimulus;
     RadioGroup TE_num_passes;
+    RadioGroup DP_num_passes;
     RadioGroup TE_stim_lvl;
 
     CheckBox DP_freq_1k;
@@ -89,6 +97,7 @@ public class SettingsActivity extends AppCompatActivity {
         TE_max_dur_spin = (Spinner) findViewById(R.id.sp_set_teoe_max_dur);
 //        TE_stimulus = (RadioGroup) findViewById(R.id.rbg_set_teoe_stim);
         TE_num_passes = (RadioGroup) findViewById(R.id.rbg_set_teoe_no_pass);
+        DP_num_passes = (RadioGroup) findViewById(R.id.rbg_set_dpoae_no_pass);
 //        TE_stim_lvl = (RadioGroup) findViewById(R.id.rbg_set_teoe_stim_lvl);
 
         DP_freq_1k = (CheckBox) findViewById(R.id.cb_set_dpoae_freq_1k);
@@ -161,24 +170,26 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        TE_num_passes.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
-                    case R.id.rb_set_teoe_no_pass_3:
-                        settingsHelper.settings.setTE_num_of_passes(3);
-                        break;
-                    case R.id.rb_set_teoe_no_pass_4:
-                        settingsHelper.settings.setTE_num_of_passes(4);
-                        break;
-                    case R.id.rb_set_teoe_no_pass_5:
-                        settingsHelper.settings.setTE_num_of_passes(5);
-                        break;
-                }
+//        TE_num_passes.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                switch(checkedId){
+//                    case R.id.rb_set_teoe_no_pass_3:
+//                        settingsHelper.settings.setTE_num_of_passes(3);
+//                        break;
+//                    case R.id.rb_set_teoe_no_pass_4:
+//                        settingsHelper.settings.setTE_num_of_passes(4);
+//                        break;
+//                    case R.id.rb_set_teoe_no_pass_5:
+//                        settingsHelper.settings.setTE_num_of_passes(5);
+//                        break;
+//                }
+//
+//                settingsHelper.updateSettingPreset();
+//            }
+//        });
 
-                settingsHelper.updateSettingPreset();
-            }
-        });
+
 
         DP_freq_1k.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -188,6 +199,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._1K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -199,6 +211,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._1K5.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -210,6 +223,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._2K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -221,6 +235,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._3K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -232,6 +247,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._4K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -243,6 +259,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._5K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -254,6 +271,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._6K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -265,6 +283,7 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     settingsHelper.settings.setDP_freq(SettingsModel.DP_FREQS._8K.getValue(), 0);
                 settingsHelper.updateSettingPreset();
+                updatePassRBs(Boolean.FALSE);
             }
         });
 
@@ -306,6 +325,8 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         loadSettingsPreset(settingsHelper.getSettings());
+
+        updatePassRBs(Boolean.FALSE);
     }
 
     void loadSettingsPreset(SettingsModel settings){
@@ -333,12 +354,12 @@ public class SettingsActivity extends AppCompatActivity {
         else
             ((RadioButton) findViewById(R.id.rb_set_teoe_stim_opt)).setChecked(true);
 
-        if(settings.getTE_num_of_passes() == 3)
-            ((RadioButton) findViewById(R.id.rb_set_teoe_no_pass_3)).setChecked(true);
-        else if(settings.getTE_num_of_passes() == 4)
-            ((RadioButton) findViewById(R.id.rb_set_teoe_no_pass_4)).setChecked(true);
-        else
-            ((RadioButton) findViewById(R.id.rb_set_teoe_no_pass_5)).setChecked(true);
+//        if(settings.getTE_num_of_passes() == 3)
+//            ((RadioButton) findViewById(R.id.rb_set_teoe_no_pass_3)).setChecked(true);
+//        else if(settings.getTE_num_of_passes() == 4)
+//            ((RadioButton) findViewById(R.id.rb_set_teoe_no_pass_4)).setChecked(true);
+//        else
+//            ((RadioButton) findViewById(R.id.rb_set_teoe_no_pass_5)).setChecked(true);
 
         switch (settings.getTE_stim_lvl()){
             case 60:
@@ -404,7 +425,7 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
         }
 
-        switch((int)settings.getDP_SNR()){
+        switch(settings.getDP_SNR()){
             case 3:
                 DP_SNR_spin.setSelection(0);
                 break;
@@ -417,6 +438,62 @@ public class SettingsActivity extends AppCompatActivity {
             case 12:
                 DP_SNR_spin.setSelection(3);
                 break;
+        }
+    }
+
+    public void updatePassRBs(Boolean TE){
+        //DYNAMIC NUM OF PASSES
+        RadioGroup rg = new RadioGroup(this);
+        rg.setOrientation(LinearLayout.HORIZONTAL);
+        rg.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT));
+        rg.setGravity(Gravity.CENTER);
+        byte freqs_checked = 0;
+
+        if(TE){
+
+        }else{
+            if(DP_freq_1k.isChecked()) freqs_checked++;
+            if(DP_freq_1k5.isChecked()) freqs_checked++;
+            if(DP_freq_2k.isChecked()) freqs_checked++;
+            if(DP_freq_3k.isChecked()) freqs_checked++;
+            if(DP_freq_4k.isChecked()) freqs_checked++;
+            if(DP_freq_5k.isChecked()) freqs_checked++;
+            if(DP_freq_6k.isChecked()) freqs_checked++;
+            if(DP_freq_8k.isChecked()) freqs_checked++;
+        }
+
+        //number of radio buttons
+        List<Byte> numerators = new ArrayList<Byte>();
+        if(freqs_checked>4){
+            final RadioButton[] rb_gt4 = new RadioButton[3];
+            for(int i=(freqs_checked-2); i<=freqs_checked; i++){
+                rb_gt4[i - freqs_checked + 2]  = new RadioButton(this);
+                rb_gt4[i - freqs_checked + 2].setLayoutParams(new RadioGroup.LayoutParams(
+                        RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT));
+                rg.addView(rb_gt4[i - freqs_checked + 2]);
+                String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
+                rb_gt4[i - freqs_checked + 2].setText(Html.fromHtml(text));
+            }
+        }else if(freqs_checked <= 4 && freqs_checked >= 2){
+            final RadioButton[] rb_3o2 = new RadioButton[2];
+            for(int i=(freqs_checked-1); i<=freqs_checked; i++){
+                rb_3o2[i - freqs_checked + 1]  = new RadioButton(this);
+                rg.addView(rb_3o2[i - freqs_checked + 1]);
+                String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
+                rb_3o2[i - freqs_checked + 1].setText(Html.fromHtml(text));
+            }
+        }else if(freqs_checked == 1){
+            final RadioButton rb_1 = new RadioButton(this);
+            rg.addView(rb_1);
+            String text = String.format("<sup>%d</sup>/<sub>%d</sub>", 1, freqs_checked);
+            rb_1.setText(Html.fromHtml(text));
+        }
+        if(TE){
+
+        }else{
+            DP_num_passes.removeAllViews();
+            DP_num_passes.addView(rg);
         }
     }
 }

@@ -50,4 +50,8 @@ public class SettingsHelper {
         myDb.updateSettings(this.settings);
     }
 
+    public void compileSettings(){
+
+    }
+
 }
