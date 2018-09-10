@@ -191,6 +191,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
 
+
         DP_freq_1k.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -327,6 +328,16 @@ public class SettingsActivity extends AppCompatActivity {
         loadSettingsPreset(settingsHelper.getSettings());
 
         updatePassRBs(Boolean.FALSE);
+
+//        DP_num_passes.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                String button_text =
+//                        (String) ((RadioButton)group.getChildAt(checkedId)).getText().toString();
+//                String[] split_button_text = button_text.split("/");
+//                settingsHelper.settings.setDP_num_of_passes(Integer.parseInt(split_button_text[0]));
+//            }
+//        });
     }
 
     void loadSettingsPreset(SettingsModel settings){
@@ -441,6 +452,17 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    private int getDPFrequencyCount(){
+        int freqs_checked = 0;
+
+        boolean[] freqs = settingsHelper.settings.getDP_freqs();
+
+        for(int i = 0; i < 8; i++)
+            if(freqs[i] == true) freqs_checked++;
+
+        return freqs_checked;
+    }
+
     public void updatePassRBs(Boolean TE){
         //DYNAMIC NUM OF PASSES
         RadioGroup rg = new RadioGroup(this);
@@ -448,19 +470,25 @@ public class SettingsActivity extends AppCompatActivity {
         rg.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
                 RadioGroup.LayoutParams.WRAP_CONTENT));
         rg.setGravity(Gravity.CENTER);
-        byte freqs_checked = 0;
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton btn = (RadioButton) group.getChildAt(checkedId);
+                if(btn != null) {
+                    String button_text =
+                            (String) btn.getText().toString();
+                    String[] split_button_text = button_text.split("/");
+                    int button_val = Integer.parseInt(split_button_text[0]);
+                    settingsHelper.settings.setDP_num_of_passes(button_val);
+                }
+            }
+        });
+        int freqs_checked = 0;
 
         if(TE){
 
         }else{
-            if(DP_freq_1k.isChecked()) freqs_checked++;
-            if(DP_freq_1k5.isChecked()) freqs_checked++;
-            if(DP_freq_2k.isChecked()) freqs_checked++;
-            if(DP_freq_3k.isChecked()) freqs_checked++;
-            if(DP_freq_4k.isChecked()) freqs_checked++;
-            if(DP_freq_5k.isChecked()) freqs_checked++;
-            if(DP_freq_6k.isChecked()) freqs_checked++;
-            if(DP_freq_8k.isChecked()) freqs_checked++;
+            freqs_checked = getDPFrequencyCount();
         }
 
         //number of radio buttons
@@ -476,6 +504,8 @@ public class SettingsActivity extends AppCompatActivity {
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
                 rb_gt4[i - freqs_checked + 2].setText(Html.fromHtml(text));
             }
+            settingsHelper.settings.setDP_num_of_passes(freqs_checked-2);
+            settingsHelper.updateSettingPreset();
         }else if(freqs_checked <= 4 && freqs_checked >= 2){
             final RadioButton[] rb_3o2 = new RadioButton[2];
             for(int i=(freqs_checked-1); i<=freqs_checked; i++){
@@ -485,12 +515,16 @@ public class SettingsActivity extends AppCompatActivity {
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
                 rb_3o2[i - freqs_checked + 1].setText(Html.fromHtml(text));
             }
+            settingsHelper.settings.setDP_num_of_passes(freqs_checked-1);
+            settingsHelper.updateSettingPreset();
         }else if(freqs_checked == 1){
             final RadioButton rb_1 = new RadioButton(this);
 //            rb_1.setChecked(true);
             rg.addView(rb_1);
             String text = String.format("<sup>%d</sup>/<sub>%d</sub>", 1, freqs_checked);
             rb_1.setText(Html.fromHtml(text));
+            settingsHelper.settings.setDP_num_of_passes(1);
+            settingsHelper.updateSettingPreset();
         }
         if(TE){
 

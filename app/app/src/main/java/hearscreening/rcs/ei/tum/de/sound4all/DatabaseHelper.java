@@ -392,7 +392,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_FREQ_8K, settings.getDP_freq(SettingsModel.DP_FREQS._8K));
         contentValues.put(DP_T_THRESH, settings.getDP_threshold());
         contentValues.put(DP_R_F1, settings.getDP_f1());
-        contentValues.put(DP_R_F2, settings.getDP_f2());
         contentValues.put(DP_R_L1, settings.getDP_l1());
         contentValues.put(DP_R_L2, settings.getDP_l2());
         contentValues.put(DP_T_MAX_DUR, settings.getDP_max_duration());
@@ -540,7 +539,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ret_settings.setDP_freq(7, c.getInt(c.getColumnIndex(DP_FREQ_8K)));
             ret_settings.setDP_threshold(c.getInt(c.getColumnIndex(DP_T_THRESH)));
             ret_settings.setDP_f1(c.getFloat(c.getColumnIndex(DP_R_F1)));
-            ret_settings.setDP_f2(c.getFloat(c.getColumnIndex(DP_R_F2)));
             ret_settings.setDP_l1(c.getFloat(c.getColumnIndex(DP_R_L1)));
             ret_settings.setDP_l2(c.getFloat(c.getColumnIndex(DP_R_L2)));
             ret_settings.setDP_max_duration(c.getFloat(c.getColumnIndex(DP_T_MAX_DUR)));

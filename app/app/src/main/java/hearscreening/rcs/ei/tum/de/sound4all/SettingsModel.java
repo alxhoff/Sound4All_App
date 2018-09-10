@@ -84,11 +84,11 @@ public class SettingsModel {
     private Integer TE_stim_lvl;
 
     //DPOAE
+    private Integer DP_num_of_passes;
     private boolean[] DP_freqs;
     private SNR_dBs DP_SNR;
     private float DP_threshold;
     private float DP_f1;
-    private float DP_f2;
     private float DP_l1;
     private float DL_l2;
     private float DP_max_duration;
@@ -121,10 +121,6 @@ public class SettingsModel {
         this.DP_f1 = DP_f1;
     }
 
-    public void setDP_f2(float DP_f2) {
-        this.DP_f2 = DP_f2;
-    }
-
     public void setDP_freq(int index, int value){
         this.DP_freqs[index] = (value != 0);
     }
@@ -143,6 +139,10 @@ public class SettingsModel {
 
     public void setDP_max_duration(float DP_max_duration) {
         this.DP_max_duration = DP_max_duration;
+    }
+
+    public void setDP_num_of_passes(Integer DP_num_of_passes) {
+        this.DP_num_of_passes = DP_num_of_passes;
     }
 
     public void setDP_threshold(float DP_threshold) {
@@ -190,12 +190,12 @@ public class SettingsModel {
         return DP_f1;
     }
 
-    public float getDP_f2() {
-        return DP_f2;
-    }
-
     public float getDP_l1() {
         return DP_l1;
+    }
+
+    public Integer getDP_num_of_passes() {
+        return DP_num_of_passes;
     }
 
     public Integer getTE_num_of_passes() {
