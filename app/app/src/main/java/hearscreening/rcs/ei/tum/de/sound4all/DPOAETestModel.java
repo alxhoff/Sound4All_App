@@ -13,7 +13,7 @@ public class DPOAETestModel extends TestModel{
 
     private Float noise;
     private Float DP_level;
-    private Float f2;
+    private Float f1;
     private Float l1;
     private Float l2;
 
@@ -24,8 +24,8 @@ public class DPOAETestModel extends TestModel{
         this.DP_level = DP_level;
     }
 
-    public void setF2(Float f2) {
-        this.f2 = f2;
+    public void setF1(Float f1) {
+        this.f1 = f1;
     }
 
     public void setL1(Float l1) {
@@ -56,8 +56,8 @@ public class DPOAETestModel extends TestModel{
         return DP_level;
     }
 
-    public Float getF2() {
-        return f2;
+    public Float getF1() {
+        return f1;
     }
 
     public Float getL1() {

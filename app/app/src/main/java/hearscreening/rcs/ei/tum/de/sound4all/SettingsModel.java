@@ -80,11 +80,12 @@ public class SettingsModel {
     //TEOAE
     private float TE_max_duration;
     private TE_STIMULUS TE_stimulus;
-    private Integer TE_num_of_passes;
-    private Integer TE_stim_lvl;
+    private SNR_dBs TE_SNR;
+    private int TE_num_of_passes;
+    private int TE_stim_lvl;
 
     //DPOAE
-    private Integer DP_num_of_passes;
+    private int DP_num_of_passes;
     private boolean[] DP_freqs;
     private SNR_dBs DP_SNR;
     private float DP_threshold;
@@ -103,6 +104,8 @@ public class SettingsModel {
     public SettingsModel(Context context){
         this.DP_freqs = new boolean[8];
         this.DP_SNR = SNR_dBs._3;
+        this.TE_SNR = SNR_dBs._3;
+        this.TE_stimulus = TE_STIMULUS.STANDARD;
         this.context = context;
         this.sharedPreferences = context.getSharedPreferences(
                 context.getResources().getString(R.string.preferences_key), Context.MODE_PRIVATE);
@@ -165,6 +168,10 @@ public class SettingsModel {
         this.TE_stimulus = TE_stimulus;
     }
 
+    public void setTE_SNR(int DP_SNR) {
+        this.TE_SNR.value = DP_SNR;
+    }
+
     //getters
     public int getPreset_ID() {
         return preset_ID;
@@ -212,6 +219,10 @@ public class SettingsModel {
 
     public int getDP_SNR() {
         return DP_SNR.value;
+    }
+
+    public int getTE_SNR() {
+        return TE_SNR.value;
     }
 
     public boolean getDP_freq(DP_FREQS index){

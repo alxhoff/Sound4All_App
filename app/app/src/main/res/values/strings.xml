@@ -76,7 +76,7 @@
         <item>60</item>
     </string-array>
 
-    <string-array name="set_dpoae_snr_spin_vals">
+    <string-array name="set_snr_spin_vals">
         <item>3</item>
         <item>6</item>
         <item>9</item>
@@ -102,7 +102,7 @@
     <string name="set_dpoae_frequency_6k">6k</string>
     <string name="set_dpoae_frequency_8k">8k</string>
 
-    <string name="set_dpoae_snr_title">SNR</string>
+    <string name="set_snr_title">SNR</string>
 
     <string name="set_save">Save</string>
 

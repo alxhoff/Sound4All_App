@@ -83,6 +83,42 @@
                 </LinearLayout>
                 <View style="@style/Divider"/>
                 <LinearLayout
+                    android:id="@+id/ll_set_teoe_snr"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_set_teoe_snr_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:text="@string/set_snr_title" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:paddingBottom="20dp"
+                        android:orientation="horizontal">
+                        <Spinner
+                            android:id="@+id/sp_set_teoe_snr"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:entries="@array/set_snr_spin_vals"
+                            />
+                        <TextView
+                            android:id="@+id/textView14"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/db_unit" />
+                    </LinearLayout>
+                </LinearLayout>
+                <View style="@style/Divider"/>
+                <LinearLayout
                     android:id="@+id/ll_set_teoe_stim_sec"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -690,7 +726,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:padding="5dp"
-                        android:text="@string/set_dpoae_snr_title" />
+                        android:text="@string/set_snr_title" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -703,7 +739,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:entries="@array/set_dpoae_snr_spin_vals"
+                            android:entries="@array/set_snr_spin_vals"
                             />
                         <TextView
                             android:id="@+id/textView133"

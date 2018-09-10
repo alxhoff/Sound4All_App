@@ -35,9 +35,10 @@ public class SettingsActivity extends AppCompatActivity {
     Spinner TE_max_dur_spin;
     RadioGroup TE_stimulus;
     RadioGroup TE_num_passes;
-    RadioGroup DP_num_passes;
     RadioGroup TE_stim_lvl;
+    Spinner TE_SNR_spin;
 
+    RadioGroup DP_num_passes;
     CheckBox DP_freq_1k;
     CheckBox DP_freq_1k5;
     CheckBox DP_freq_2k;
@@ -97,9 +98,10 @@ public class SettingsActivity extends AppCompatActivity {
         TE_max_dur_spin = (Spinner) findViewById(R.id.sp_set_teoe_max_dur);
 //        TE_stimulus = (RadioGroup) findViewById(R.id.rbg_set_teoe_stim);
         TE_num_passes = (RadioGroup) findViewById(R.id.rbg_set_teoe_no_pass);
-        DP_num_passes = (RadioGroup) findViewById(R.id.rbg_set_dpoae_no_pass);
 //        TE_stim_lvl = (RadioGroup) findViewById(R.id.rbg_set_teoe_stim_lvl);
+        TE_SNR_spin = (Spinner) findViewById(R.id.sp_set_teoe_snr);
 
+        DP_num_passes = (RadioGroup) findViewById(R.id.rbg_set_dpoae_no_pass);
         DP_freq_1k = (CheckBox) findViewById(R.id.cb_set_dpoae_freq_1k);
         DP_freq_1k5 = (CheckBox) findViewById(R.id.cb_set_dpoae_freq_1k5);
         DP_freq_2k = (CheckBox) findViewById(R.id.cb_set_dpoae_freq_2k);
@@ -161,6 +163,20 @@ public class SettingsActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getItemAtPosition(position).toString();
                 settingsHelper.settings.setDP_SNR(Integer.parseInt(selectedItem));
+                settingsHelper.updateSettingPreset();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        TE_SNR_spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                settingsHelper.settings.setTE_SNR(Integer.parseInt(selectedItem));
                 settingsHelper.updateSettingPreset();
             }
 
@@ -450,6 +466,21 @@ public class SettingsActivity extends AppCompatActivity {
                 DP_SNR_spin.setSelection(3);
                 break;
         }
+
+        switch(settings.getTE_SNR()){
+            case 3:
+                TE_SNR_spin.setSelection(0);
+                break;
+            case 6:
+                TE_SNR_spin.setSelection(1);
+                break;
+            case 9:
+                TE_SNR_spin.setSelection(2);
+                break;
+            case 12:
+                TE_SNR_spin.setSelection(3);
+                break;
+        }
     }
 
     private int getDPFrequencyCount(){
@@ -497,7 +528,6 @@ public class SettingsActivity extends AppCompatActivity {
             final RadioButton[] rb_gt4 = new RadioButton[3];
             for(int i=(freqs_checked-2); i<=freqs_checked; i++){
                 rb_gt4[i - freqs_checked + 2]  = new RadioButton(this);
-//                if(i == freqs_checked - 2) rb_gt4[i - freqs_checked + 2].setChecked(true);
                     rb_gt4[i - freqs_checked + 2].setLayoutParams(new RadioGroup.LayoutParams(
                         RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT));
                 rg.addView(rb_gt4[i - freqs_checked + 2]);
@@ -510,7 +540,6 @@ public class SettingsActivity extends AppCompatActivity {
             final RadioButton[] rb_3o2 = new RadioButton[2];
             for(int i=(freqs_checked-1); i<=freqs_checked; i++){
                 rb_3o2[i - freqs_checked + 1]  = new RadioButton(this);
-//                if(i == freqs_checked - 1) rb_3o2[i - freqs_checked + 2].setChecked(true);
                 rg.addView(rb_3o2[i - freqs_checked + 1]);
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
                 rb_3o2[i - freqs_checked + 1].setText(Html.fromHtml(text));
@@ -519,7 +548,6 @@ public class SettingsActivity extends AppCompatActivity {
             settingsHelper.updateSettingPreset();
         }else if(freqs_checked == 1){
             final RadioButton rb_1 = new RadioButton(this);
-//            rb_1.setChecked(true);
             rg.addView(rb_1);
             String text = String.format("<sup>%d</sup>/<sub>%d</sub>", 1, freqs_checked);
             rb_1.setText(Html.fromHtml(text));

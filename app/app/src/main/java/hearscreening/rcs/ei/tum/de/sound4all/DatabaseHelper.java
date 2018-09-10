@@ -60,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //test ID
     public final static String DP_R_NOISE = "DP_RES_NOISE";
     public final static String DP_R_LEVEL = "DP_RES_LEVEL";
-    public final static String DP_R_F2 = "DP_RES_F2";
+    public final static String DP_R_F1 = "DP_RES_F1";
     public final static String DP_R_L1 = "DP_RES_L1";
     public final static String DP_R_L2 = "DP_RES_L2";
 
@@ -71,6 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String TE_DUR = "TE_DUR";
     public final static String TE_STIMULUS_LVL = "TE_STIM_LVL";
     public final static String TE_MAX_DUR = "TE_MAX_DUR";
+    public final static String TE_T_SNR = "TE_TEST_SNR";
 
 
     //*****************COMMON COLS****************//
@@ -81,6 +82,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String SET_PRESET = "SETTING_PRESET";
     public final static String TE_STIMULUS = "TE_STIMULUS";
     public final static String TE_NO_PASSES = "TE_NUM_OF_PASSES";
+    public final static String DP_NO_PASSES = "DE_NUM_OF_PASSES";
     public final static String DP_FREQ_1K = "DP_FREQ_1K";
     public final static String DP_FREQ_1K5 = "DP_FREQ_1K5";
     public final static String DP_FREQ_2K = "DP_FREQ_2K";
@@ -89,7 +91,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public final static String DP_FREQ_5K = "DP_FREQ_5K";
     public final static String DP_FREQ_6K = "DP_FREQ_6K";
     public final static String DP_FREQ_8K = "DP_FREQ_8K";
-    public final static String DP_R_F1 = "DP_R_F1";
     public final static String DP_T_SNR = "DP_TEST_SNR";
 
 
@@ -129,7 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TEST_ID + " INTEGER PRIMARY KEY, "
             + DP_R_NOISE + " REAL, "
             + DP_R_LEVEL + " REAL, "
-            + DP_R_F2 + " INTEGER, "
+            + DP_R_F1 + " INTEGER, "
             + DP_R_L1 + " INTEGER, "
             + DP_R_L2 + " INTEGER)";
 
@@ -141,7 +142,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TE_FILE_NAME + " TEXT, "
             + TE_DUR + " REAL, "
             + TE_MAX_DUR + " REAL, "
-            + TE_STIMULUS_LVL + " REAL)";
+            + TE_STIMULUS_LVL + " REAL, "
+            + TE_T_SNR + " INTEGER)";
 
 
     //***************TE TESTS TABLE***************//
@@ -152,6 +154,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TE_STIMULUS + " TEXT, "
             + TE_NO_PASSES + " INTEGER, "
             + TE_STIMULUS_LVL + " INTEGER, "
+            + TE_T_SNR + " INTEGER, "
+            + DP_NO_PASSES + " INTEGER, "
             + DP_FREQ_1K + " BOOLEAN, "
             + DP_FREQ_1K5 + " BOOLEAN, "
             + DP_FREQ_2K + " BOOLEAN, "
@@ -162,7 +166,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + DP_FREQ_8K + " BOOLEAN, "
             + DP_T_THRESH + " INTEGER, "
             + DP_R_F1 + " REAL, "
-            + DP_R_F2 + " REAL, "
             + DP_R_L1 + " REAL, "
             + DP_R_L2 + " REAL, "
             + DP_T_MAX_DUR + " REAL, "
@@ -204,8 +207,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TE_MAX_DUR, 30.0);
         contentValues.put(TE_STIMULUS, SettingsModel.TE_STIMULUS.STANDARD.name());
         contentValues.put(TE_STIMULUS_LVL, 60);
-        contentValues.put(TE_NO_PASSES, 3);
+        contentValues.put(TE_NO_PASSES, 1);
+        contentValues.put(TE_T_SNR, 3);
 
+        contentValues.put(DP_NO_PASSES, 1);
         contentValues.put(DP_FREQ_1K, 1);
         contentValues.put(DP_FREQ_1K5, 1);
         contentValues.put(DP_FREQ_2K, 1);
@@ -216,7 +221,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(DP_FREQ_8K, 1);
         contentValues.put(DP_T_THRESH, 8);
         contentValues.put(DP_R_F1, 1);
-        contentValues.put(DP_R_F2, 2);
         contentValues.put(DP_R_L1, 3);
         contentValues.put(DP_R_L2, 4);
         contentValues.put(DP_T_MAX_DUR, 15.0);
@@ -347,7 +351,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TEST_ID, test.getTest_ID());
         contentValues.put(DP_R_NOISE, test.getNoise());
         contentValues.put(DP_R_LEVEL, test.getDP_level());
-        contentValues.put(DP_R_F2, test.getF2());
+        contentValues.put(DP_R_F1, test.getF1());
         contentValues.put(DP_R_L1, test.getL1());
         contentValues.put(DP_R_L2, test.getL2());
         long result = db.insert(DP_RESULTS_TABLE, null, contentValues);
@@ -381,7 +385,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TE_STIMULUS, String.valueOf(settings.getTE_stimulus()));
         contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
         contentValues.put(TE_NO_PASSES, settings.getTE_num_of_passes());
+        contentValues.put(TE_T_SNR, settings.getTE_SNR());
 
+        contentValues.put(DP_NO_PASSES, settings.getDP_num_of_passes());
         contentValues.put(DP_FREQ_1K, settings.getDP_freq(SettingsModel.DP_FREQS._1K));
         contentValues.put(DP_FREQ_1K5, settings.getDP_freq(SettingsModel.DP_FREQS._1K5));
         contentValues.put(DP_FREQ_2K, settings.getDP_freq(SettingsModel.DP_FREQS._2K));
@@ -529,6 +535,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ret_settings.setTE_stimulus(SettingsModel.TE_STIMULUS.valueOf(c.getString(c.getColumnIndex(TE_STIMULUS))));
             ret_settings.setTE_num_of_passes(c.getInt(c.getColumnIndex(TE_NO_PASSES)));
             ret_settings.setTE_stim_lvl(c.getInt(c.getColumnIndex(TE_STIMULUS_LVL)));
+            ret_settings.setTE_SNR(c.getInt(c.getColumnIndex(TE_T_SNR)));
+            ret_settings.setDP_num_of_passes(c.getInt(c.getColumnIndex(DP_NO_PASSES)));
             ret_settings.setDP_freq(0, c.getInt(c.getColumnIndex(DP_FREQ_1K)));
             ret_settings.setDP_freq(1, c.getInt(c.getColumnIndex(DP_FREQ_1K5)));
             ret_settings.setDP_freq(2, c.getInt(c.getColumnIndex(DP_FREQ_2K)));
@@ -576,7 +584,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
         contentValues.put(TE_NO_PASSES, settings.getTE_num_of_passes());
         contentValues.put(TE_STIMULUS_LVL, settings.getTE_stim_lvl());
-
+        contentValues.put(TE_T_SNR, settings.getTE_SNR());
+        contentValues.put(DP_NO_PASSES, settings.getDP_num_of_passes());
         contentValues.put(DP_FREQ_1K, settings.getDP_freq(SettingsModel.DP_FREQS._1K));
         contentValues.put(DP_FREQ_1K5, settings.getDP_freq(SettingsModel.DP_FREQS._1K5));
         contentValues.put(DP_FREQ_2K, settings.getDP_freq(SettingsModel.DP_FREQS._2K));
