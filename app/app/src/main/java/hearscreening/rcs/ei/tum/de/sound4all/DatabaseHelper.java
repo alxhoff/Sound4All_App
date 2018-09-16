@@ -272,6 +272,75 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /******************************************************************************
+     *************************************TESTS************************************
+     ******************************************************************************/
+
+    public boolean checkCursorColString(Cursor cursor, String column, String test_value){
+        int check = cursor.getColumnIndex(column);
+
+        if(check == -1)
+            throw new IllegalArgumentException("column '" + column
+                    + "' does not exist.");
+
+        String cursor_val = cursor.getString(check);
+
+        if(cursor_val == null) return false;
+
+        if(cursor_val.equals(test_value)) return true;
+
+        return false;
+    }
+
+    public boolean checkCursorColInt(Cursor cursor, String column, int test_value){
+        int check = cursor.getColumnIndex(column);
+
+        if(check == -1)
+            throw new IllegalArgumentException("column '" + column
+                    + "' does not exist.");
+
+        int cursor_val = cursor.getInt(check);
+
+        if(cursor_val == test_value) return true;
+
+        return false;
+    }
+
+    public boolean checkPatientExists(PatientModel patient){
+
+        boolean ret = false;
+
+        Cursor family_name_patients = getPatiensByFamilyName(patient.getFamilyName());
+
+        if(family_name_patients != null)
+            family_name_patients.moveToFirst();
+
+        int tests_passed;
+        for(int i = 0; i < family_name_patients.getCount(); i++){
+            tests_passed = 0;
+
+            //given name
+            if(checkCursorColString(family_name_patients, PAT_GN, patient.getGivenName()) == true)
+                tests_passed++;
+            //DOB
+            if(checkCursorColString(family_name_patients, PAT_DOB, patient.getDob()) == true)
+                tests_passed++;
+            //weight
+            if(checkCursorColInt(family_name_patients, PAT_WT, patient.getWeight()) == true)
+                tests_passed++;
+            //height
+            if(checkCursorColInt(family_name_patients, PAT_HT, patient.getHeight()) == true)
+                tests_passed++;
+
+            if(tests_passed == 4){
+                ret = true;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    /******************************************************************************
      ************************************CREATORS**********************************
      ******************************************************************************/
     public boolean createPatient(String family_name, String given_name, String dob,
@@ -295,6 +364,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean createPatient(PatientModel patient)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+
+        //check doesnt already exsist
+        checkPatientExists(patient);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(PAT_FN, patient.getFamilyName());
@@ -420,10 +492,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    public Cursor getPatiensByFamilyName(String family_name){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery =
+                "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_FN + " = " + "'" + family_name + "'";
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = null;
+
+        try{
+            c = db.rawQuery(selectQuery, null);
+
+            //check family name
+            if(c.moveToFirst())
+                return c;
+            else
+                return null;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
     public PatientModel getPatientByID(String ID){
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String selectQuery = "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_ID + " = " + "'"+ID+"'";
+        String selectQuery =
+                "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_ID + " = " + "'"+ ID +"'";
 
         Log.e(TAG, selectQuery);
 
@@ -443,7 +539,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return tmp_patient;
     }
 
-    public boolean patientExists(String ID){
+    public boolean patientIDExists(String ID){
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_ID + " = " + "'"+ID+"'";
@@ -468,7 +564,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public PatientModel getPatientByFamilyName(String family_name){
+    public PatientModel getFirstPatientByFamilyName(String family_name){
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_FN + " = " + family_name;
 
@@ -531,12 +627,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             c.moveToFirst();
 
             ret_settings.setPreset_ID(c.getInt(c.getColumnIndex(SET_PRESET)));
-            ret_settings.setTE_max_duration(c.getFloat(c.getColumnIndex(TE_MAX_DUR)));
+            ret_settings.setTE_max_duration((byte)c.getInt(c.getColumnIndex(TE_MAX_DUR)));
             ret_settings.setTE_stimulus(SettingsModel.TE_STIMULUS.valueOf(c.getString(c.getColumnIndex(TE_STIMULUS))));
-            ret_settings.setTE_num_of_passes(c.getInt(c.getColumnIndex(TE_NO_PASSES)));
-            ret_settings.setTE_stim_lvl(c.getInt(c.getColumnIndex(TE_STIMULUS_LVL)));
-            ret_settings.setTE_SNR(c.getInt(c.getColumnIndex(TE_T_SNR)));
-            ret_settings.setDP_num_of_passes(c.getInt(c.getColumnIndex(DP_NO_PASSES)));
+            ret_settings.setTE_num_of_passes((byte)c.getInt(c.getColumnIndex(TE_NO_PASSES)));
+            ret_settings.setTE_stim_lvl((byte)c.getInt(c.getColumnIndex(TE_STIMULUS_LVL)));
+            ret_settings.setTE_SNR((byte)c.getInt(c.getColumnIndex(TE_T_SNR)));
+            ret_settings.setDP_num_of_passes((byte)c.getInt(c.getColumnIndex(DP_NO_PASSES)));
             ret_settings.setDP_freq(0, c.getInt(c.getColumnIndex(DP_FREQ_1K)));
             ret_settings.setDP_freq(1, c.getInt(c.getColumnIndex(DP_FREQ_1K5)));
             ret_settings.setDP_freq(2, c.getInt(c.getColumnIndex(DP_FREQ_2K)));
@@ -549,8 +645,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ret_settings.setDP_f1(c.getFloat(c.getColumnIndex(DP_R_F1)));
             ret_settings.setDP_l1(c.getFloat(c.getColumnIndex(DP_R_L1)));
             ret_settings.setDP_l2(c.getFloat(c.getColumnIndex(DP_R_L2)));
-            ret_settings.setDP_max_duration(c.getFloat(c.getColumnIndex(DP_T_MAX_DUR)));
-            ret_settings.setDP_SNR(c.getInt(c.getColumnIndex(DP_T_SNR)));
+            ret_settings.setDP_max_duration((byte)c.getInt(c.getColumnIndex(DP_T_MAX_DUR)));
+            ret_settings.setDP_SNR((byte)c.getInt(c.getColumnIndex(DP_T_SNR)));
         }
 
         c.close();

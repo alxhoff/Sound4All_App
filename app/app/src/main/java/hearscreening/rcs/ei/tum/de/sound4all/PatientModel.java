@@ -8,6 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class PatientModel implements Parcelable{
     private Integer ID;
@@ -114,10 +115,18 @@ public class PatientModel implements Parcelable{
     public void sendPatient(Context context, Tag tag) throws IOException, FormatException {
         NFCHelper nfcHelper = new NFCHelper(context);
 
+        this.addPatient(context, tag);
+
+        nfcHelper.writeStoredRecords(tag);
+    }
+
+    public void addPatient(Context context, Tag tag) throws UnsupportedEncodingException {
+        NFCHelper nfcHelper = new NFCHelper(context);
+
         //add records
         if(this.ID != null)
             nfcHelper.addRecord(String.valueOf(this.ID),
-                NFCHelper.RECORD_IDS.PATIENT_ID);
+                    NFCHelper.RECORD_IDS.PATIENT_ID);
         if(this.family_name != null && !this.family_name.isEmpty())
             nfcHelper.addRecord(this.family_name, NFCHelper.RECORD_IDS.FAMILY_NAME);
         if(this.given_name != null && !this.given_name.isEmpty())
@@ -128,8 +137,6 @@ public class PatientModel implements Parcelable{
             nfcHelper.addRecord(String.valueOf(this._height), NFCHelper.RECORD_IDS.HEIGHT);
         if(this.weight != null)
             nfcHelper.addRecord(String.valueOf(this.weight), NFCHelper.RECORD_IDS.WEIGHT);
-
-        nfcHelper.writeStoredRecords(tag);
     }
 
     @Override

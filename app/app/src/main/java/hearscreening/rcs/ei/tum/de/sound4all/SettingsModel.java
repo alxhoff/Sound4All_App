@@ -12,20 +12,42 @@ public class SettingsModel {
     private Context context;
 
     public enum TE_STIMULUS{
-        OPTIMIZED, STANDARD
+        OPTIMIZED (0),
+        STANDARD(1);
+
+        private byte value;
+        private static Map map = new HashMap<>();
+
+        TE_STIMULUS(int value){
+            this.value = (byte)value;
+        }
+
+        static{
+            for(SettingsModel.TE_STIMULUS stimIndex : SettingsModel.TE_STIMULUS.values()){
+                map.put(stimIndex.value, stimIndex);
+            }
+        }
+
+        public static SettingsModel.TE_STIMULUS valueOf(int stimIndex){
+            return (SettingsModel.TE_STIMULUS) map.get(stimIndex);
+        }
+
+        public byte getValue(){
+            return value;
+        }
     }
 
     public enum SNR_dBs{
-        _3(3),
-        _6(6),
-        _9(9),
-        _12(12);
+        THREE(0),
+        SIX(1),
+        NINE(2),
+        TWELVE(3);
 
-        private int value;
+        private byte value;
         private static Map map = new HashMap<>();
 
         SNR_dBs(int value){
-            this.value = value;
+            this.value = (byte)value;
         }
 
         static{
@@ -38,7 +60,7 @@ public class SettingsModel {
             return (SettingsModel.SNR_dBs) map.get(dBIndex);
         }
 
-        public int getValue() {
+        public byte getValue() {
             return value;
         }
     }
@@ -78,33 +100,45 @@ public class SettingsModel {
     private int preset_ID;
 
     //TEOAE
-    private float TE_max_duration;
+    private byte TE_max_duration;
     private TE_STIMULUS TE_stimulus;
     private SNR_dBs TE_SNR;
-    private int TE_num_of_passes;
-    private int TE_stim_lvl;
+    private byte TE_num_of_passes;
+    private byte TE_stim_lvl;
+
+    //compiled config bits
+    // 8 bit: max dur(sec)
+    // 1 bit: Stimulus - 1=optimized, 0=standard
+    // 2 bit: SNR - 0=3, 1=6, 2=9, 3=12
+    // 3 bit: Num of passes - i+1
+    // 3 bit: stim level - 60=1, 65=2, 70=3. 75=4, 80=5, 85=6
 
     //DPOAE
-    private int DP_num_of_passes;
+    private byte DP_num_of_passes;
     private boolean[] DP_freqs;
     private SNR_dBs DP_SNR;
+    private byte DP_max_duration;
     private float DP_threshold;
     private float DP_f1;
     private float DP_l1;
     private float DL_l2;
-    private float DP_max_duration;
 
     //compiled config bits
-    // | 8 bit: max dur(sec) | 1 bit: Stimulus- 1=optimized, 0=standard | \
-    // |3 bit: stim level- 60=1, 65=2, 70=3. 75=4, 80=5, 85=6
+    // 8 bit: Max dur TODO can be changed!
+    // 3 bit: Num of passes - i+1
+    // 2 bit: SNR - 0=3, 1=6, 2=9, 3=12
+    // 8 bit: DP_freqs, bool flags MSB=1, LSB=8
+    // 32 bit: F1
+    // 32 bit: L1
+    // 32 bit: L2
 
     //app preferences
     SharedPreferences sharedPreferences;
 
     public SettingsModel(Context context){
         this.DP_freqs = new boolean[8];
-        this.DP_SNR = SNR_dBs._3;
-        this.TE_SNR = SNR_dBs._3;
+        this.DP_SNR = SNR_dBs.THREE;
+        this.TE_SNR = SNR_dBs.THREE;
         this.TE_stimulus = TE_STIMULUS.STANDARD;
         this.context = context;
         this.sharedPreferences = context.getSharedPreferences(
@@ -132,19 +166,24 @@ public class SettingsModel {
         this.DP_freqs = DP_freqs;
     }
 
-    public void setDP_SNR(int DP_SNR) {
+    public void setDP_SNR(SNR_dBs DP_SNR) {
+        this.DP_SNR = DP_SNR;
+    }
+
+    public void setDP_SNR(byte DP_SNR) {
         this.DP_SNR.value = DP_SNR;
     }
+
 
     public void setDP_l1(float DP_l1) {
         this.DP_l1 = DP_l1;
     }
 
-    public void setDP_max_duration(float DP_max_duration) {
+    public void setDP_max_duration(byte DP_max_duration) {
         this.DP_max_duration = DP_max_duration;
     }
 
-    public void setDP_num_of_passes(Integer DP_num_of_passes) {
+    public void setDP_num_of_passes(byte DP_num_of_passes) {
         this.DP_num_of_passes = DP_num_of_passes;
     }
 
@@ -152,15 +191,15 @@ public class SettingsModel {
         this.DP_threshold = DP_threshold;
     }
 
-    public void setTE_max_duration(float TE_max_duration) {
+    public void setTE_max_duration(byte TE_max_duration) {
         this.TE_max_duration = TE_max_duration;
     }
 
-    public void setTE_num_of_passes(Integer TE_num_of_passes) {
+    public void setTE_num_of_passes(byte TE_num_of_passes) {
         this.TE_num_of_passes = TE_num_of_passes;
     }
 
-    public void setTE_stim_lvl(Integer TE_stim_lvl) {
+    public void setTE_stim_lvl(byte TE_stim_lvl) {
         this.TE_stim_lvl = TE_stim_lvl;
     }
 
@@ -168,7 +207,11 @@ public class SettingsModel {
         this.TE_stimulus = TE_stimulus;
     }
 
-    public void setTE_SNR(int DP_SNR) {
+    public void setTE_SNR(SNR_dBs DP_SNR) {
+        this.TE_SNR = DP_SNR;
+    }
+
+    public void setTE_SNR(byte DP_SNR) {
         this.TE_SNR.value = DP_SNR;
     }
 
@@ -177,7 +220,7 @@ public class SettingsModel {
         return preset_ID;
     }
 
-    public float getDP_max_duration() {
+    public byte getDP_max_duration() {
         return DP_max_duration;
     }
 
@@ -185,7 +228,7 @@ public class SettingsModel {
         return DP_threshold;
     }
 
-    public float getTE_max_duration() {
+    public byte getTE_max_duration() {
         return TE_max_duration;
     }
 
@@ -201,15 +244,15 @@ public class SettingsModel {
         return DP_l1;
     }
 
-    public Integer getDP_num_of_passes() {
+    public byte getDP_num_of_passes() {
         return DP_num_of_passes;
     }
 
-    public Integer getTE_num_of_passes() {
+    public byte getTE_num_of_passes() {
         return TE_num_of_passes;
     }
 
-    public Integer getTE_stim_lvl() {
+    public byte getTE_stim_lvl() {
         return TE_stim_lvl;
     }
 
@@ -217,11 +260,11 @@ public class SettingsModel {
         return DP_freqs;
     }
 
-    public int getDP_SNR() {
+    public byte getDP_SNR() {
         return DP_SNR.value;
     }
 
-    public int getTE_SNR() {
+    public byte getTE_SNR() {
         return TE_SNR.value;
     }
 
@@ -229,8 +272,8 @@ public class SettingsModel {
         return DP_freqs[index.getValue()];
     }
 
-    public TE_STIMULUS getTE_stimulus() {
-        return TE_stimulus;
+    public byte getTE_stimulus() {
+        return TE_stimulus.getValue();
     }
 
     public void sendConfig(Context context, Tag tag, TestModel.TestType testType){

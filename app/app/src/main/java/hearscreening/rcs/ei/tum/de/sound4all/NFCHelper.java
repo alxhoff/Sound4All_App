@@ -1,5 +1,6 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -16,6 +17,8 @@ import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -110,6 +113,16 @@ public class NFCHelper {
         this.records.add(createRecord(record_contents, (byte) record_id.getValue()));
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public void addSettingsRecord(List<Byte> settings){
+//        NdefRecord.createExternal("example.com", "mytype", byteArray)
+        byte[] settings_bytes =
+                ArrayUtils.toPrimitive(settings.toArray(new Byte[settings.size()]));
+        this.records.add(NdefRecord.createExternal("s4a.testSettings", "settings",
+                settings_bytes));
+    }
+
     public void clearRecords(){
         records.clear();
     }
@@ -129,6 +142,8 @@ public class NFCHelper {
                     return;
                 ndef.writeNdefMessage(message);
                 ndef.close();
+                //clear records from helper
+                this.clearRecords();
             }
         }catch(Exception e){}
 
@@ -218,6 +233,8 @@ public class NFCHelper {
 
         return recordNFC;
     }
+
+
 
     /******************************************************************************
      **************************************Read************************************
@@ -341,6 +358,8 @@ public class NFCHelper {
                         break;
                 }
             }
+            //check patient doesn't already exist
+
             databaseHelper.createPatient(tmp_patient);
         }
     }

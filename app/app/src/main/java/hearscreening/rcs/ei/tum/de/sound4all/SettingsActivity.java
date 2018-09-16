@@ -134,7 +134,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getItemAtPosition(position).toString();
-                settingsHelper.settings.setTE_max_duration(Float.parseFloat(selectedItem));
+                settingsHelper.settings.setTE_max_duration((byte)Integer.parseInt(selectedItem));
                 settingsHelper.updateSettingPreset();
             }
 
@@ -148,7 +148,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getItemAtPosition(position).toString();
-                settingsHelper.settings.setDP_max_duration(Float.parseFloat(selectedItem));
+                settingsHelper.settings.setDP_max_duration((byte)Integer.parseInt(selectedItem));
                 settingsHelper.updateSettingPreset();
             }
 
@@ -162,7 +162,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getItemAtPosition(position).toString();
-                settingsHelper.settings.setDP_SNR(Integer.parseInt(selectedItem));
+                settingsHelper.settings.setDP_SNR((byte)Integer.parseInt(selectedItem));
                 settingsHelper.updateSettingPreset();
             }
 
@@ -176,7 +176,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = parent.getItemAtPosition(position).toString();
-                settingsHelper.settings.setTE_SNR(Integer.parseInt(selectedItem));
+                settingsHelper.settings.setTE_SNR((byte)Integer.parseInt(selectedItem));
                 settingsHelper.updateSettingPreset();
             }
 
@@ -376,7 +376,7 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
         }
 
-        if(settings.getTE_stimulus() == SettingsModel.TE_STIMULUS.STANDARD)
+        if(settings.getTE_stimulus() == SettingsModel.TE_STIMULUS.STANDARD.getValue())
             ((RadioButton) findViewById(R.id.rb_set_teoe_stim_std)).setChecked(true);
         else
             ((RadioButton) findViewById(R.id.rb_set_teoe_stim_opt)).setChecked(true);
@@ -483,8 +483,8 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private int getDPFrequencyCount(){
-        int freqs_checked = 0;
+    private byte getDPFrequencyCount(){
+        byte freqs_checked = 0;
 
         boolean[] freqs = settingsHelper.settings.getDP_freqs();
 
@@ -509,12 +509,12 @@ public class SettingsActivity extends AppCompatActivity {
                     String button_text =
                             (String) btn.getText().toString();
                     String[] split_button_text = button_text.split("/");
-                    int button_val = Integer.parseInt(split_button_text[0]);
+                    byte button_val = (byte)Integer.parseInt(split_button_text[0]);
                     settingsHelper.settings.setDP_num_of_passes(button_val);
                 }
             }
         });
-        int freqs_checked = 0;
+        byte freqs_checked = 0;
 
         if(TE){
 
@@ -534,7 +534,7 @@ public class SettingsActivity extends AppCompatActivity {
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
                 rb_gt4[i - freqs_checked + 2].setText(Html.fromHtml(text));
             }
-            settingsHelper.settings.setDP_num_of_passes(freqs_checked-2);
+            settingsHelper.settings.setDP_num_of_passes((byte)(freqs_checked-2));
             settingsHelper.updateSettingPreset();
         }else if(freqs_checked <= 4 && freqs_checked >= 2){
             final RadioButton[] rb_3o2 = new RadioButton[2];
@@ -544,14 +544,14 @@ public class SettingsActivity extends AppCompatActivity {
                 String text = String.format("<sup>%d</sup>/<sub>%d</sub>", i, freqs_checked);
                 rb_3o2[i - freqs_checked + 1].setText(Html.fromHtml(text));
             }
-            settingsHelper.settings.setDP_num_of_passes(freqs_checked-1);
+            settingsHelper.settings.setDP_num_of_passes((byte)(freqs_checked-1));
             settingsHelper.updateSettingPreset();
         }else if(freqs_checked == 1){
             final RadioButton rb_1 = new RadioButton(this);
             rg.addView(rb_1);
             String text = String.format("<sup>%d</sup>/<sub>%d</sub>", 1, freqs_checked);
             rb_1.setText(Html.fromHtml(text));
-            settingsHelper.settings.setDP_num_of_passes(1);
+            settingsHelper.settings.setDP_num_of_passes((byte)1);
             settingsHelper.updateSettingPreset();
         }
         if(TE){

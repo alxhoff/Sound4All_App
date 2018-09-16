@@ -104,10 +104,6 @@ public class TestModel implements Parcelable{
         this.duration = in.readFloat();
     }
 
-    public TestModel(Integer patient_ID){
-        this.patient_ID = patient_ID;
-    }
-
     public TestModel(Integer patient_ID, Integer test_ID){
         this.patient_ID = patient_ID;
         this.test_ID = test_ID;
