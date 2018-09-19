@@ -38,7 +38,9 @@ public class NFCHelper {
         HEIGHT(5),
         WEIGHT(6),
         TE_CONFIG(7),
-        DP_CONFIG(8);
+        DP_CONFIG(8),
+        TE_DATA(9),
+        DP_DATA(10);
 
         private int value;
         private static Map map = new HashMap<>();
@@ -359,7 +361,6 @@ public class NFCHelper {
                 }
             }
             //check patient doesn't already exist
-
             databaseHelper.createPatient(tmp_patient);
         }
     }
@@ -367,6 +368,20 @@ public class NFCHelper {
     /******************************************************************************
      ***********************************Test***************************************
      ******************************************************************************/
+    public boolean containsTests(NdefMessage[] msgs){
+        NFCHelper.RECORD_IDS record_id = RECORD_IDS.NONE;
+
+        for(int i = 0; i < msgs.length; i++){
+            for(int j = 0; j < msgs.length; j++){
+                record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                if(record_id == RECORD_IDS.TE_DATA  || record_id == RECORD_IDS.DP_DATA)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     public void storeNewDPOAETest(NdefMessage msg){
 
     }

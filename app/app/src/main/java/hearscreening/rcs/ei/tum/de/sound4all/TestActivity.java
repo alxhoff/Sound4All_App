@@ -6,15 +6,10 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.Image;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
 import android.os.Build;
-import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,19 +17,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.NotDirectoryException;
 import java.util.List;
 
 import hearscreening.rcs.ei.tum.de.sound4all.TestModel.TestType;
+
+import static hearscreening.rcs.ei.tum.de.sound4all.NFCHelper.RECORD_IDS.PATIENT_ID;
 
 public class TestActivity extends AppCompatActivity {
 
@@ -108,26 +101,23 @@ public class TestActivity extends AppCompatActivity {
             nfcHelper.rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         }
         try {
-            //read device to see if exsisting test exsists that does not exsist in database
+            //read device to see if existing test exists that does not exist in database
             if(nfcHelper.rawMsgs != null){
                 nfcHelper.msgs = new NdefMessage[nfcHelper.rawMsgs.length];
                 for(int i = 0; i < nfcHelper.rawMsgs.length; i++){
                     nfcHelper.msgs[i] = (NdefMessage) nfcHelper.rawMsgs[i];
                 }
                 //TODO add checking test against DB to check
-                if(checkDifferentPatient(nfcHelper.msgs)){
-                    //new patient
-                    //check patient exsists
+                int patient_ID_in_DB = isDifferentPatient(nfcHelper.msgs);
+                if(patient_ID_in_DB == 0){
+                    //different patient
+                    //check patient exists and store if not
                     nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
                 }else{
-                    //same patient
-                    patient.sendPatient(this, nfcHelper.nfcTag);
+                    //same patient - update local ID
+                    patient.setID(patient_ID_in_DB);
                 }
-                patient.sendPatient(this, nfcHelper.nfcTag);
-            }
-            //if not send patient data and test config to start new test
-            else{
-                patient.addPatient(this, nfcHelper.nfcTag);
+                //TODO CHECK FOR TESTS ON TAG
             }
             //send test config
             TestModel.TestType test_type = test.getTest_type();
@@ -147,6 +137,10 @@ public class TestActivity extends AppCompatActivity {
                 default:
                     break;
             }
+            //prepare data for tag
+            //add patient
+            if(patient != null)
+                patient.addPatient(this, nfcHelper.nfcTag);
             //send compiled settings
             //HERE
             if(compiled_settings != null)
@@ -161,35 +155,148 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkDifferentPatient(NdefMessage[] msgs){
+    //return 0 if the same else returns ID of patient in DB
+    private int isDifferentPatient(NdefMessage[] msgs){
+        //reconstruct patient in TAG
+        PatientModel patient_in_tag = new PatientModel(this);
+        //check all messages
         for(int i = 0; i < msgs.length; i++){
+            //get all records
+            NFCHelper.RECORD_IDS record_id = NFCHelper.RECORD_IDS.NONE;
             for(int j = 0; j < msgs[i].getRecords().length; j++){
-                byte record_id = 0;
-                record_id = msgs[i].getRecords()[j].getId()[0];
-                if(record_id != 0) {
-                    if (msgs[i].getRecords()[j].getId()[0] == NFCHelper.RECORD_IDS.PATIENT_ID.getValue()) { //ndef contains a patient
-                        byte[] payload = msgs[i].getRecords()[j].getPayload();
-                        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
-                        int languageCodeLength = payload[0] & 0063;
-                        try {
-                            //check this string length (-2)
-                            String patient_ID_string = new String(payload, languageCodeLength + 1,
-                                    payload.length - languageCodeLength - 2, textEncoding);
-                            //is current patient?
-                            String compare_string = patient.getID().toString();
-                            if (patient_ID_string.equals(patient.getID().toString()))
-                                //new patient
-                                return false;
-                            else
-                                return true;
-                        } catch (UnsupportedEncodingException e) {
-                            Log.e("UnsupportedEncoding", e.toString());
+                //current record's ID
+                record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                if(record_id != NFCHelper.RECORD_IDS.NONE) {
+                    //populate patient information
+                    switch(record_id){
+                        case PATIENT_ID:{
+                            byte[] payload = msgs[i].getRecords()[j].getPayload();
+                            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                            int languageCodeLength = payload[0] & 0063;
+                            try {
+                                patient_in_tag.setID(Integer.parseInt(new String(payload, languageCodeLength + 1,
+                                        payload.length - languageCodeLength - 2, textEncoding)));
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e("UnsupportedEncoding", e.toString());
+                            }
                         }
+                            break;
+                        case FAMILY_NAME:{
+                            byte[] payload = msgs[i].getRecords()[j].getPayload();
+                            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                            int languageCodeLength = payload[0] & 0063;
+                            try {
+                                patient_in_tag.setFamilyName(new String(payload, languageCodeLength + 1,
+                                        payload.length - languageCodeLength - 2, textEncoding));
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e("UnsupportedEncoding", e.toString());
+                            }
+                        }
+                            break;
+                        case GIVEN_NAME:{
+                            byte[] payload = msgs[i].getRecords()[j].getPayload();
+                            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                            int languageCodeLength = payload[0] & 0063;
+                            try {
+                                patient_in_tag.setGivenName(new String(payload, languageCodeLength + 1,
+                                        payload.length - languageCodeLength - 2, textEncoding));
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e("UnsupportedEncoding", e.toString());
+                            }
+                        }
+                            break;
+                        case DOB:{
+                            byte[] payload = msgs[i].getRecords()[j].getPayload();
+                            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                            int languageCodeLength = payload[0] & 0063;
+                            try {
+                                patient_in_tag.setDob(new String(payload, languageCodeLength + 1,
+                                        payload.length - languageCodeLength - 2, textEncoding));
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e("UnsupportedEncoding", e.toString());
+                            }
+                        }
+                            break;
+                        case HEIGHT:{
+                            byte[] payload = msgs[i].getRecords()[j].getPayload();
+                            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                            int languageCodeLength = payload[0] & 0063;
+                            try {
+                                //ID of patient on TAG
+                                patient_in_tag.setHeight(Integer.parseInt(new String(payload, languageCodeLength + 1,
+                                        payload.length - languageCodeLength - 2, textEncoding)));
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e("UnsupportedEncoding", e.toString());
+                            }
+                        }
+                            break;
+                        case WEIGHT:{
+                            byte[] payload = msgs[i].getRecords()[j].getPayload();
+                            String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+                            int languageCodeLength = payload[0] & 0063;
+                            try {
+                                //ID of patient on TAG
+                                patient_in_tag.setWeight(Integer.parseInt(new String(payload, languageCodeLength + 1,
+                                        payload.length - languageCodeLength - 2, textEncoding)));
+                            } catch (UnsupportedEncodingException e) {
+                                Log.e("UnsupportedEncoding", e.toString());
+                            }
+                        }
+                            break;
+                        default:
+                            break;
                     }
+//                    if (msgs[i].getRecords()[j].getId()[0] == PATIENT_ID.getValue()) { //ndef contains a patient
+//                        byte[] payload = msgs[i].getRecords()[j].getPayload();
+//                        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
+//                        int languageCodeLength = payload[0] & 0063;
+//                        try {
+//                            //ID of patient on TAG
+//                            String patient_ID_string = new String(payload, languageCodeLength + 1,
+//                                    payload.length - languageCodeLength - 2, textEncoding);
+//                            String compare_string = patient.getID().toString();
+//
+//                            //patient has same ID?
+//                            if (patient_ID_string.equals(patient.getID().toString())) {
+//                                //same ID
+//                                DatabaseHelper databaseHelper = new DatabaseHelper(this);
+//                                //get current patient from DB with ID of patient on tag
+//                                PatientModel patient_at_tag_ID =
+//                                        databaseHelper.getPatientByID(patient_ID_string);
+//
+//                                //check patient is the same as the one stored in DB at tag ID
+//                                if(databaseHelper.samePatient(patient, patient_at_tag_ID))
+//                                    return false;
+//
+//                                //check patient doesn't exist with different ID
+//                                if(databaseHelper.checkPatientExists(patient_at_tag_ID))
+//                            }
+//                            else
+//                                //different ID
+//                                //check patient doesn't exist under different ID
+//
+//                                return true;
+//                        } catch (UnsupportedEncodingException e) {
+//                            Log.e("UnsupportedEncoding", e.toString());
+//                        }
+//                    }
                 }
             }
         }
-        return false;
+        //get patient stored at same id in DB
+        PatientModel patient_in_DB = databaseHelper.getPatientByID(patient_in_tag.getID());
+
+        //are they the same?
+        if(databaseHelper.samePatient(patient_in_tag, patient_in_DB))
+            return 0;
+
+        //check if patient exists in DB with different ID
+        int tag_patient_DB_ID = 0;
+        tag_patient_DB_ID = databaseHelper.checkPatientExists(patient_in_tag);
+        if(tag_patient_DB_ID != 0)
+            return tag_patient_DB_ID;
+
+        return 0;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD_MR1)

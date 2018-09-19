@@ -57,7 +57,7 @@ public class PatientHistory extends AppCompatActivity {
 
         //get patient information
         myDb = new DatabaseHelper(PatientHistory.this);
-        patient = myDb.getPatientByID(patient_ID);
+        patient = myDb.getPatientByID(Integer.parseInt(patient_ID));
 
         getSupportActionBar().setTitle("Patient History");
 

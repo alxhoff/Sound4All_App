@@ -305,68 +305,82 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public boolean checkPatientExists(PatientModel patient){
-
-        boolean ret = false;
+    public int checkPatientExists(PatientModel patient){
 
         Cursor family_name_patients = getPatiensByFamilyName(patient.getFamilyName());
 
-        if(family_name_patients != null)
+        if(family_name_patients != null) {
             family_name_patients.moveToFirst();
 
-        int tests_passed;
-        for(int i = 0; i < family_name_patients.getCount(); i++){
-            tests_passed = 0;
+            int tests_passed;
+            for (int i = 0; i < family_name_patients.getCount(); i++) {
+                tests_passed = 0;
 
-            //given name
-            if(checkCursorColString(family_name_patients, PAT_GN, patient.getGivenName()) == true)
-                tests_passed++;
-            //DOB
-            if(checkCursorColString(family_name_patients, PAT_DOB, patient.getDob()) == true)
-                tests_passed++;
-            //weight
-            if(checkCursorColInt(family_name_patients, PAT_WT, patient.getWeight()) == true)
-                tests_passed++;
-            //height
-            if(checkCursorColInt(family_name_patients, PAT_HT, patient.getHeight()) == true)
-                tests_passed++;
+                //given name
+                if (checkCursorColString(family_name_patients, PAT_GN, patient.getGivenName()) == true)
+                    tests_passed++;
+                //DOB
+                if (checkCursorColString(family_name_patients, PAT_DOB, patient.getDob()) == true)
+                    tests_passed++;
+                //weight
+                if (checkCursorColInt(family_name_patients, PAT_WT, patient.getWeight()) == true)
+                    tests_passed++;
+                //height
+                if (checkCursorColInt(family_name_patients, PAT_HT, patient.getHeight()) == true)
+                    tests_passed++;
 
-            if(tests_passed == 4){
-                ret = true;
-                break;
+                if (tests_passed == 4) {
+                    return family_name_patients.getInt(family_name_patients.getColumnIndex(PAT_ID));
+                }
+                family_name_patients.moveToNext();
             }
         }
+        return 0;
+    }
 
-        return ret;
+    public boolean samePatient(PatientModel first, PatientModel second){
+//        String second_given_name = second.getGivenName();
+//        String first_given_name = first.getGivenName();
+        if(!first.getGivenName().equals(second.getGivenName())) return false;
+
+        if(!first.getFamilyName().equals(second.getFamilyName())) return false;
+
+        if(!first.getDob().equals(second.getDob())) return false;
+
+        if(first.getHeight() != second.getHeight()) return false;
+
+        if(first.getWeight() != second.getWeight()) return false;
+
+        return true;
     }
 
     /******************************************************************************
      ************************************CREATORS**********************************
      ******************************************************************************/
-    public boolean createPatient(String family_name, String given_name, String dob,
-                                 Integer weight, Integer height)
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(PAT_FN, family_name);
-        contentValues.put(PAT_GN, given_name);
-        contentValues.put(PAT_DOB, dob);
-        contentValues.put(PAT_HT, height);
-        contentValues.put(PAT_WT, weight);
-        long result = db.insert(PATIENTS_TABLE, null, contentValues);
-        if(result == -1)
-            return false;
-        else
-            return true;
-    }
+//    public boolean createPatient(String family_name, String given_name, String dob,
+//                                 Integer weight, Integer height)
+//    {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(PAT_FN, family_name);
+//        contentValues.put(PAT_GN, given_name);
+//        contentValues.put(PAT_DOB, dob);
+//        contentValues.put(PAT_HT, height);
+//        contentValues.put(PAT_WT, weight);
+//        long result = db.insert(PATIENTS_TABLE, null, contentValues);
+//        if(result == -1)
+//            return false;
+//        else
+//            return true;
+//    }
 
     public boolean createPatient(PatientModel patient)
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        //check doesnt already exsist
-        checkPatientExists(patient);
+        //check doesnt already exsist - HERE TEST THIS
+        if(checkPatientExists(patient) != 0) return true;
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(PAT_FN, patient.getFamilyName());
@@ -515,11 +529,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public PatientModel getPatientByID(String ID){
+    public PatientModel getPatientByID(int ID){
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery =
-                "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_ID + " = " + "'"+ ID +"'";
+                "SELECT * FROM " + PATIENTS_TABLE + " WHERE " + PAT_ID + " = " + "'"+
+                        Integer.toString(ID) +"'";
 
         Log.e(TAG, selectQuery);
 

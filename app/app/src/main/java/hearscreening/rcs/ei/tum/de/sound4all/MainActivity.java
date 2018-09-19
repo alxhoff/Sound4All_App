@@ -103,19 +103,25 @@ public class MainActivity extends AppCompatActivity {
                         et_given_name.getText().toString(), tv_date.getText().toString(),
                         et_height.getText().toString(), et_weight.getText().toString()});
                 if(fields_populated) {
-                    boolean isInserted = myDb.createPatient(et_family_name.getText().toString(),
+                    PatientModel new_patient = new PatientModel(null,
+                            et_family_name.getText().toString(),
                             et_given_name.getText().toString(),
                             tv_date.getText().toString(),
                             Integer.parseInt(et_height.getText().toString()),
                             Integer.parseInt(et_weight.getText().toString()));
+                    boolean isInserted = myDb.createPatient(new_patient);
                     if (isInserted == true) {
-                        Toast.makeText(MainActivity.this, getResources().getString(R.string.patient_stored_toast), Toast.LENGTH_LONG).show();
-                        Intent createNewUser = new Intent(MainActivity.this, PatientListActivity.class);
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.patient_stored_toast),
+                                Toast.LENGTH_LONG).show();
+                        Intent createNewUser = new Intent(MainActivity.this,
+                                PatientListActivity.class);
                         startActivity(createNewUser);
                     }else
-                        Toast.makeText(MainActivity.this, "Patient not stored, DB error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Patient not stored, DB error",
+                                Toast.LENGTH_LONG).show();
                 }else
-                    Toast.makeText(MainActivity.this, getResources().getString(R.string.patient_store_failed_toast), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, getResources().getString(R.string.patient_store_failed_toast),
+                            Toast.LENGTH_LONG).show();
             }
         });
     }
