@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
@@ -16,15 +15,16 @@ import android.os.Build;
 import android.os.Parcelable;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class NFCHelper {
@@ -105,14 +105,15 @@ public class NFCHelper {
 
     public void addRecord(String record_contents){
         try {
-            this.records.add(createRecord(record_contents));
+            this.records.add(createTextRecord(record_contents));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void addRecord(String record_contents, RECORD_IDS record_id) throws UnsupportedEncodingException {
-        this.records.add(createRecord(record_contents, (byte) record_id.getValue()));
+        this.records.add(createTextRecord(record_contents, (byte) record_id.getValue()));
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -162,7 +163,7 @@ public class NFCHelper {
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD_MR1)
     public void writeSingleRecordMessage(String text, Tag tag) throws IOException, FormatException {
-        NdefRecord[] records = { createRecord(text) };
+        NdefRecord[] records = { createTextRecord(text) };
         NdefMessage message = new NdefMessage(records);
         // Get an instance of Ndef for the tag.
         Ndef ndef = Ndef.get(tag);
@@ -174,9 +175,10 @@ public class NFCHelper {
         ndef.close();
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD_MR1)
     public void writeSingleRecordMessage(String text, byte ID, Tag tag) throws IOException, FormatException {
-        NdefRecord[] records = { createRecord(text, ID) };
+        NdefRecord[] records = { createTextRecord(text, ID) };
         NdefMessage message = new NdefMessage(records);
         // Get an instance of Ndef for the tag.
         Ndef ndef = Ndef.get(tag);
@@ -189,7 +191,7 @@ public class NFCHelper {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
-    private NdefRecord createRecord(String text) throws UnsupportedEncodingException {
+    private NdefRecord createTextRecord(String text) throws UnsupportedEncodingException {
         String lang       = "en";
         byte[] textBytes  = text.getBytes();
         byte[] langBytes  = lang.getBytes("US-ASCII");
@@ -204,39 +206,70 @@ public class NFCHelper {
         System.arraycopy(langBytes, 0, payload, 1,              langLength);
         System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
 
-        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,  new byte[0], payload);
+        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,
+                new byte[0], payload);
 
         return recordNFC;
     }
 
-    private NdefRecord createRecord(String text, byte ID) throws UnsupportedEncodingException {
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private NdefRecord createTextRecord(String text, byte ID) throws UnsupportedEncodingException {
         String lang       = "en";
         byte[] textBytes  = text.getBytes();
-        byte[] langBytes  = lang.getBytes("US-ASCII");
-        int    langLength = langBytes.length;
-        int    textLength = textBytes.length;
-        byte[] id = new byte[1];
-        id[0] = ID;
-        int idLength = id.length;
-        byte[] payload    = new byte[1 + langLength + textLength + idLength];
-//        byte[] payload    = new byte[1 + langLength + textLength];
+//        byte[] langBytes  = lang.getBytes("US-ASCII");
+        byte[] langBytes  = lang.getBytes(StandardCharsets.UTF_8);
+//        byte[] id = new byte[1];
+//        id[0] = ID;
+//        byte[] payload    = new byte[1 + langBytes.length + textBytes.length + id.length];
+        byte[] payload    = new byte[1 + langBytes.length + textBytes.length];
 
         // set status byte (see NDEF spec for actual bits)
-        payload[0] = (byte) langLength;
+        payload[0] = (byte) lang.length();
         //set use id flag
-        payload[0] |= (1 << 3);
+//        payload[0] |= (1 << 3);
 
         // copy langbytes and textbytes into payload
-        System.arraycopy(langBytes, 0, payload, 1,              langLength);
-        System.arraycopy(textBytes, 0, payload, 1 + langLength, textLength);
-        System.arraycopy(id, 0, payload, 1 + langLength + textLength, idLength);
+        System.arraycopy(langBytes, 0, payload, 1, langBytes.length);
+        System.arraycopy(textBytes, 0, payload, 1 + langBytes.length,
+                textBytes.length);
+//        System.arraycopy(id, 0, payload, 1 + langBytes.length + textBytes.length,
+//                id.length);
 
-        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,  id, payload);
+//        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,
+//                id, payload);
+
+        NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,  NdefRecord.RTD_TEXT,
+                new byte[]{ID}, payload);
 
         return recordNFC;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private NdefRecord createExternalRecord(List<Byte> data, byte ID, String domain,
+                                            String type){
+        byte[] data_array = ArrayUtils.toPrimitive(data.toArray(new Byte[data.size()]));
 
+        if(domain == null) throw new NullPointerException("Please give a valid domain");
+        if(type == null) throw new NullPointerException("Please give a valid type");
+
+        domain = domain.trim().toLowerCase(Locale.ROOT);
+        type = type.trim().toLowerCase(Locale.ROOT);
+
+        if (domain.length() == 0) throw new IllegalArgumentException("domain is empty");
+        if (type.length() == 0) throw new IllegalArgumentException("type is empty");
+
+        byte[] byteDomain = domain.getBytes(StandardCharsets.UTF_8);
+        byte[] byteType = type.getBytes(StandardCharsets.UTF_8);
+        byte[] headerBytes = new byte[byteDomain.length + 1 + byteType.length];
+
+        System.arraycopy(byteDomain, 0, headerBytes, 0, byteDomain.length);
+        headerBytes[byteDomain.length] = ':';
+        System.arraycopy(byteType, 0, headerBytes, byteDomain.length + 1, byteType.length);
+
+        return new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, headerBytes, new byte[]{ID}, data_array);
+    }
 
     /******************************************************************************
      **************************************Read************************************
@@ -372,9 +405,43 @@ public class NFCHelper {
         NFCHelper.RECORD_IDS record_id = RECORD_IDS.NONE;
 
         for(int i = 0; i < msgs.length; i++){
+            NdefRecord[] records = msgs[i].getRecords();
             for(int j = 0; j < msgs.length; j++){
-                record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                byte[] record_id_byte = null;
+
+                if(msgs[i].getRecords().length > 0)
+                    record_id_byte = records[j].getId();
+                else break;
+
+                if(record_id_byte.length > 0)
+                    record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                else break;
+
                 if(record_id == RECORD_IDS.TE_DATA  || record_id == RECORD_IDS.DP_DATA)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean containsTestsConfig(NdefMessage[] msgs){
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+
+        for(int i = 0; i < msgs.length; i++){
+            NdefRecord[] records = msgs[i].getRecords();
+            for(int j = 0; j < msgs.length; j++){
+                byte[] record_id_byte = null;
+
+                if(msgs[i].getRecords().length > 0)
+                    record_id_byte = records[j].getId();
+                else break;
+
+                if(record_id_byte.length > 0)
+                    record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                else break;
+
+                if(record_id == RECORD_IDS.TE_CONFIG  || record_id == RECORD_IDS.DP_CONFIG)
                     return true;
             }
         }

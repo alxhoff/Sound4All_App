@@ -1,11 +1,14 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.nfc.FormatException;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.RequiresApi;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -112,6 +115,8 @@ public class PatientModel implements Parcelable{
     }
 
     //NFC
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void sendPatient(Context context, Tag tag) throws IOException, FormatException {
         NFCHelper nfcHelper = new NFCHelper(context);
 
@@ -120,6 +125,8 @@ public class PatientModel implements Parcelable{
         nfcHelper.writeStoredRecords(tag);
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void addPatient(Context context, Tag tag) throws UnsupportedEncodingException {
         NFCHelper nfcHelper = new NFCHelper(context);
 

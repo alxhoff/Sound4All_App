@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -87,8 +88,7 @@ public class TestActivity extends AppCompatActivity {
         MyCustomAlertDialog();
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
@@ -107,17 +107,26 @@ public class TestActivity extends AppCompatActivity {
                 for(int i = 0; i < nfcHelper.rawMsgs.length; i++){
                     nfcHelper.msgs[i] = (NdefMessage) nfcHelper.rawMsgs[i];
                 }
-                //TODO add checking test against DB to check
+                //check if patient exists
                 int patient_ID_in_DB = isDifferentPatient(nfcHelper.msgs);
-                if(patient_ID_in_DB == 0){
+                if(patient_ID_in_DB == 0) {
                     //different patient
                     //check patient exists and store if not
                     nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
+                }else if(patient_ID_in_DB == -1){
+                    //empty tag/no patient
+                    patient_ID_in_DB = 0;
                 }else{
                     //same patient - update local ID
                     patient.setID(patient_ID_in_DB);
                 }
-                //TODO CHECK FOR TESTS ON TAG
+                //check if tag contains test data
+                if(nfcHelper.containsTests(nfcHelper.msgs)){
+                    //store data etc
+                }
+                if(nfcHelper.containsTestsConfig(nfcHelper.msgs)){
+                    //handle stored test configs
+                }
             }
             //send test config
             TestModel.TestType test_type = test.getTest_type();
@@ -163,9 +172,19 @@ public class TestActivity extends AppCompatActivity {
         for(int i = 0; i < msgs.length; i++){
             //get all records
             NFCHelper.RECORD_IDS record_id = NFCHelper.RECORD_IDS.NONE;
+            NdefRecord[] records = msgs[i].getRecords(); //HERE using zero'd out tag. Fix null records etc
             for(int j = 0; j < msgs[i].getRecords().length; j++){
                 //current record's ID
-                record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                byte[] record_id_byte = null;
+                if(msgs[i].getRecords().length > 0 )
+                    record_id_byte = records[j].getId();
+                else
+                    return -1;
+                if(record_id_byte.length > 0)
+                    record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
+                else
+                    //empty tags
+                    return -1;
                 if(record_id != NFCHelper.RECORD_IDS.NONE) {
                     //populate patient information
                     switch(record_id){
