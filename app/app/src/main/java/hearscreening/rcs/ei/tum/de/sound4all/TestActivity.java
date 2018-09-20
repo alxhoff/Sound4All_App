@@ -35,6 +35,7 @@ public class TestActivity extends AppCompatActivity {
     Dialog MyDialog;
     Button hello;
     Button close;
+    AlertDialog dialog;
 
     TestModel test;
     DPOAETestModel DPOAEtest;
@@ -85,8 +86,23 @@ public class TestActivity extends AppCompatActivity {
                 break;
         }
 
-        MyCustomAlertDialog();
-    }
+        //NFC Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                onBackPressed();
+            }
+        });
+
+        dialog = builder.create();
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogLayout = inflater.inflate(R.layout.nfc_dialog, null);
+        dialog.setView(dialogLayout);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.show();
+        }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
@@ -156,6 +172,8 @@ public class TestActivity extends AppCompatActivity {
                 nfcHelper.addSettingsRecord(compiled_settings);
 
             nfcHelper.writeStoredRecords(nfcHelper.nfcTag);
+
+            dialog.dismiss();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -330,24 +348,5 @@ public class TestActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         nfcHelper.WriteModeOn();
-    }
-
-    private void MyCustomAlertDialog(){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onBackPressed();
-            }
-        });
-
-        final AlertDialog dialog = builder.create();
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogLayout = inflater.inflate(R.layout.nfc_dialog, null);
-        dialog.setView(dialogLayout);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        dialog.show();
     }
 }
