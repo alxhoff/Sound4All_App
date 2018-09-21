@@ -425,7 +425,7 @@ public class NFCHelper {
 
         for(int i = 0; i < msgs.length; i++){
             NdefRecord[] records = msgs[i].getRecords();
-            for(int j = 0; j < msgs.length; j++){
+            for(int j = 0; j < msgs[i].getRecords().length; j++){
                 byte[] record_id_byte = null;
 
                 if(msgs[i].getRecords().length > 0)
@@ -449,7 +449,7 @@ public class NFCHelper {
 
         for(int i = 0; i < msgs.length; i++){
             NdefRecord[] records = msgs[i].getRecords();
-            for(int j = 0; j < msgs.length; j++){
+            for(int j = 0; j < msgs[i].getRecords().length; j++){
                 byte[] record_id_byte = null;
 
                 if(msgs[i].getRecords().length > 0)
