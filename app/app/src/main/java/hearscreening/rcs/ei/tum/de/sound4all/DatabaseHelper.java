@@ -683,7 +683,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(PAT_WT, patient.getWeight());
 
         db.update(PATIENTS_TABLE, values, PAT_ID + " =?",
-                new String[]{patient.getID().toString()});
+                new String[]{String.valueOf(patient.getID())});
     }
 
     public void updateSettings(SettingsModel settings){

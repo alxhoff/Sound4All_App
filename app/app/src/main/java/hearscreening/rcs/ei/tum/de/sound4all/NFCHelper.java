@@ -37,10 +37,9 @@ public class NFCHelper {
         DOB(4),
         HEIGHT(5),
         WEIGHT(6),
-        TE_CONFIG(7),
-        DP_CONFIG(8),
-        TE_DATA(9),
-        DP_DATA(10);
+        COMPILED_CONFIG(7),
+        TE_DATA(8),
+        DP_DATA(9);
 
         private int value;
         private static Map map = new HashMap<>();
@@ -116,14 +115,34 @@ public class NFCHelper {
         this.records.add(createTextRecord(record_contents, (byte) record_id.getValue()));
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    public void addSettingsRecord(List<Byte> settings){
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void addSettingsRecord(List<Byte> settings, RECORD_IDS record_id){
 //        NdefRecord.createExternal("example.com", "mytype", byteArray)
         byte[] settings_bytes =
                 ArrayUtils.toPrimitive(settings.toArray(new Byte[settings.size()]));
-        this.records.add(NdefRecord.createExternal("s4a.testSettings", "settings",
-                settings_bytes));
+//        this.records.add(NdefRecord.createExternal("s4a.testSettings", "settings",
+//                settings_bytes));
+        this.records.add(createExternalRecord(settings, (byte)record_id.getValue(), "s4asettings",
+                "compiledSettings"));
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void addPatientRecords(PatientModel patient) throws UnsupportedEncodingException {
+
+        if(patient.getID() != 0)
+            addRecord(String.valueOf(patient.getID()), RECORD_IDS.PATIENT_ID);
+        if(patient.getFamilyName() != null)
+            addRecord(patient.getFamilyName(), RECORD_IDS.FAMILY_NAME);
+        if(patient.getGivenName() != null)
+            addRecord(patient.getGivenName(), RECORD_IDS.GIVEN_NAME);
+        if(patient.getDob() != null)
+            addRecord(patient.getDob(), RECORD_IDS.DOB);
+        if(patient.getWeight() != 0)
+            addRecord(String.valueOf(patient.getWeight()), RECORD_IDS.WEIGHT);
+        if(patient.getHeight() != 0)
+            addRecord(String.valueOf(patient.getHeight()), RECORD_IDS.HEIGHT);
     }
 
     public void clearRecords(){
@@ -441,7 +460,7 @@ public class NFCHelper {
                     record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
                 else break;
 
-                if(record_id == RECORD_IDS.TE_CONFIG  || record_id == RECORD_IDS.DP_CONFIG)
+                if(record_id == RECORD_IDS.COMPILED_CONFIG)
                     return true;
             }
         }

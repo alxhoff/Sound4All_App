@@ -14,12 +14,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class PatientModel implements Parcelable{
-    private Integer ID;
+    private int ID;
     private String family_name;
     private String given_name;
     private String dob;
-    private Integer _height;
-    private Integer weight;
+    private int _height;
+    private int weight;
     private Context context;
 
 //constructors
@@ -90,61 +90,65 @@ public class PatientModel implements Parcelable{
 
     //getters
 
-    public Integer getID() {
-        return ID;
+    public int getID() {
+        if(ID != 0) return ID;
+        else return 0;
     }
 
     public String getFamilyName() {
-        return family_name;
+        if(family_name != null) return family_name;
+        else return null;
     }
 
     public String getGivenName() {
-        return given_name;
+        if(given_name != null) return given_name;
+        else return null;
     }
 
     public String getDob() {
-        return dob;
+        if(dob != null) return dob;
+        else return null;
     }
 
-    public Integer getHeight() {
+    public int getHeight() {
         return _height;
     }
 
-    public Integer getWeight() {
+    public int getWeight() {
         return weight;
     }
 
     //NFC
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void sendPatient(Context context, Tag tag) throws IOException, FormatException {
-        NFCHelper nfcHelper = new NFCHelper(context);
+//    @TargetApi(Build.VERSION_CODES.KITKAT)
+//    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//    public void sendPatient(Context context, Tag tag) throws IOException, FormatException {
+//        NFCHelper nfcHelper = new NFCHelper(context);
+//
+//        this.addPatient(context, tag);
+//
+//        nfcHelper.writeStoredRecords(tag);
+//    }
 
-        this.addPatient(context, tag);
-
-        nfcHelper.writeStoredRecords(tag);
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void addPatient(Context context, Tag tag) throws UnsupportedEncodingException {
-        NFCHelper nfcHelper = new NFCHelper(context);
-
-        //add records
-        if(this.ID != null)
-            nfcHelper.addRecord(String.valueOf(this.ID),
-                    NFCHelper.RECORD_IDS.PATIENT_ID);
-        if(this.family_name != null && !this.family_name.isEmpty())
-            nfcHelper.addRecord(this.family_name, NFCHelper.RECORD_IDS.FAMILY_NAME);
-        if(this.given_name != null && !this.given_name.isEmpty())
-            nfcHelper.addRecord(this.given_name, NFCHelper.RECORD_IDS.GIVEN_NAME);
-        if(this.dob != null && !this.dob.isEmpty())
-            nfcHelper.addRecord(this.dob, NFCHelper.RECORD_IDS.DOB);
-        if(this._height != null)
-            nfcHelper.addRecord(String.valueOf(this._height), NFCHelper.RECORD_IDS.HEIGHT);
-        if(this.weight != null)
-            nfcHelper.addRecord(String.valueOf(this.weight), NFCHelper.RECORD_IDS.WEIGHT);
-    }
+//    @TargetApi(Build.VERSION_CODES.KITKAT)
+//    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//    public void addPatient(Context context, Tag tag) throws UnsupportedEncodingException {
+//        NFCHelper nfcHelper = new NFCHelper(context);
+//
+//        //add records
+//        if(this.ID != null)
+//            nfcHelper.addRecord(String.valueOf(this.ID),
+//                    NFCHelper.RECORD_IDS.PATIENT_ID);
+//        if(this.family_name != null && !this.family_name.isEmpty())
+//            nfcHelper.addRecord(this.family_name, NFCHelper.RECORD_IDS.FAMILY_NAME);
+//        if(this.given_name != null && !this.given_name.isEmpty())
+//            nfcHelper.addRecord(this.given_name, NFCHelper.RECORD_IDS.GIVEN_NAME);
+//        if(this.dob != null && !this.dob.isEmpty())
+//            nfcHelper.addRecord(this.dob, NFCHelper.RECORD_IDS.DOB);
+//        if(this._height != null)
+//            nfcHelper.addRecord(String.valueOf(this._height), NFCHelper.RECORD_IDS.HEIGHT);
+//        if(this.weight != null)
+//            nfcHelper.addRecord(String.valueOf(this.weight), NFCHelper.RECORD_IDS.WEIGHT);
+//    }
 
     @Override
     public int describeContents() {
@@ -153,7 +157,7 @@ public class PatientModel implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        if (ID == null) {
+        if (ID == 0) {
             dest.writeInt(0);
         } else {
             dest.writeInt(ID);
@@ -161,12 +165,12 @@ public class PatientModel implements Parcelable{
         dest.writeString(family_name);
         dest.writeString(given_name);
         dest.writeString(dob);
-        if (_height == null) {
+        if (_height == 0) {
             dest.writeInt(0);
         } else {
             dest.writeInt(_height);
         }
-        if (weight == null) {
+        if (weight == 0) {
             dest.writeInt(0);
         } else {
             dest.writeInt(weight);

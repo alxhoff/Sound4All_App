@@ -134,7 +134,7 @@ public class PatientListActivity extends AppCompatActivity {
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize);
             }else{
                 tv.setBackgroundColor(Color.parseColor("#f8f8f8"));
-                tv.setText(row.getID().toString());
+                tv.setText(String.valueOf(row.getID()));
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
 

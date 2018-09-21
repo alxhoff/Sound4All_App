@@ -165,11 +165,11 @@ public class TestActivity extends AppCompatActivity {
             //prepare data for tag
             //add patient
             if(patient != null)
-                patient.addPatient(this, nfcHelper.nfcTag);
+                nfcHelper.addPatientRecords(patient);
             //send compiled settings
             //HERE
             if(compiled_settings != null)
-                nfcHelper.addSettingsRecord(compiled_settings);
+                nfcHelper.addSettingsRecord(compiled_settings, NFCHelper.RECORD_IDS.COMPILED_CONFIG);
 
             nfcHelper.writeStoredRecords(nfcHelper.nfcTag);
 
@@ -211,8 +211,9 @@ public class TestActivity extends AppCompatActivity {
                             String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
                             int languageCodeLength = payload[0] & 0063;
                             try {
+                                //note to self: with id byte in payload -1 was -2
                                 patient_in_tag.setID(Integer.parseInt(new String(payload, languageCodeLength + 1,
-                                        payload.length - languageCodeLength - 2, textEncoding)));
+                                        payload.length - languageCodeLength - 1, textEncoding)));
                             } catch (UnsupportedEncodingException e) {
                                 Log.e("UnsupportedEncoding", e.toString());
                             }
@@ -224,7 +225,7 @@ public class TestActivity extends AppCompatActivity {
                             int languageCodeLength = payload[0] & 0063;
                             try {
                                 patient_in_tag.setFamilyName(new String(payload, languageCodeLength + 1,
-                                        payload.length - languageCodeLength - 2, textEncoding));
+                                        payload.length - languageCodeLength - 1, textEncoding));
                             } catch (UnsupportedEncodingException e) {
                                 Log.e("UnsupportedEncoding", e.toString());
                             }
@@ -236,7 +237,7 @@ public class TestActivity extends AppCompatActivity {
                             int languageCodeLength = payload[0] & 0063;
                             try {
                                 patient_in_tag.setGivenName(new String(payload, languageCodeLength + 1,
-                                        payload.length - languageCodeLength - 2, textEncoding));
+                                        payload.length - languageCodeLength - 1, textEncoding));
                             } catch (UnsupportedEncodingException e) {
                                 Log.e("UnsupportedEncoding", e.toString());
                             }
@@ -248,7 +249,7 @@ public class TestActivity extends AppCompatActivity {
                             int languageCodeLength = payload[0] & 0063;
                             try {
                                 patient_in_tag.setDob(new String(payload, languageCodeLength + 1,
-                                        payload.length - languageCodeLength - 2, textEncoding));
+                                        payload.length - languageCodeLength - 1, textEncoding));
                             } catch (UnsupportedEncodingException e) {
                                 Log.e("UnsupportedEncoding", e.toString());
                             }
@@ -261,7 +262,7 @@ public class TestActivity extends AppCompatActivity {
                             try {
                                 //ID of patient on TAG
                                 patient_in_tag.setHeight(Integer.parseInt(new String(payload, languageCodeLength + 1,
-                                        payload.length - languageCodeLength - 2, textEncoding)));
+                                        payload.length - languageCodeLength - 1, textEncoding)));
                             } catch (UnsupportedEncodingException e) {
                                 Log.e("UnsupportedEncoding", e.toString());
                             }
@@ -274,7 +275,7 @@ public class TestActivity extends AppCompatActivity {
                             try {
                                 //ID of patient on TAG
                                 patient_in_tag.setWeight(Integer.parseInt(new String(payload, languageCodeLength + 1,
-                                        payload.length - languageCodeLength - 2, textEncoding)));
+                                        payload.length - languageCodeLength - 1, textEncoding)));
                             } catch (UnsupportedEncodingException e) {
                                 Log.e("UnsupportedEncoding", e.toString());
                             }
@@ -325,7 +326,7 @@ public class TestActivity extends AppCompatActivity {
 
         //are they the same?
         if(databaseHelper.samePatient(patient_in_tag, patient_in_DB))
-            return 0;
+            return patient_in_tag.getID();
 
         //check if patient exists in DB with different ID
         int tag_patient_DB_ID = 0;
