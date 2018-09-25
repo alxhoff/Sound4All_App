@@ -3,6 +3,8 @@ package hearscreening.rcs.ei.tum.de.sound4all;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import junit.framework.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,16 +68,16 @@ public class SettingsHelper {
 
     private void addByteArray(List<Byte> list, byte[] array){
         for(byte i = 0; i < array.length; i++)
-            list.add(array[i]);
+            list.add(array[array.length - i - 1]);
     }
 
     public List<Byte> compileSettings(TestModel.TestType testType){
         List<Byte> settings_bytes = new ArrayList<Byte>();
         //test type
         if(testType == TestModel.TestType.TEOAE)
-            settings_bytes.add((byte)1);
+            settings_bytes.add((byte) TestModel.TestType.DPOAE.getTestType());
         else
-            settings_bytes.add((byte)0);
+            settings_bytes.add((byte) TestModel.TestType.TEOAE.getTestType());
         //TE settings
         //max dur (seconds)
         settings_bytes.add(settings.getTE_max_duration());
@@ -89,8 +91,8 @@ public class SettingsHelper {
 
         //DP settings
         settings_bytes.add(settings.getDP_max_duration());
-        tmp = (byte)(settings.getDP_num_of_passes() << 2);
-        tmp |= settings.getDP_SNR();
+        tmp = (byte)(settings.getDP_SNR() << 3);
+        tmp |= settings.getDP_num_of_passes();
         settings_bytes.add(tmp);
 
         //DP threshold
@@ -107,5 +109,17 @@ public class SettingsHelper {
         addByteArray(settings_bytes, tmp_array);
 
         return  settings_bytes;
+    }
+
+    public TestModel decodeSettings(byte[] settings, Context context){
+        TestModel decoded_settings = new TestModel(context);
+
+        if(settings.length != 22) //TODO put in actual length
+            return null;
+
+        //1: test type
+//        if(settings[0] == 1)
+
+        return decoded_settings;
     }
 }

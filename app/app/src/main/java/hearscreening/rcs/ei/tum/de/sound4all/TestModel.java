@@ -31,12 +31,12 @@ public class TestModel implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        if (patient_ID == null) {
+        if (patient_ID == 0) {
             dest.writeInt(0);
         } else {
             dest.writeInt(patient_ID);
         }
-        if (test_ID == null) {
+        if (test_ID == 0) {
             dest.writeInt(0);
         } else {
             dest.writeInt(test_ID);
@@ -47,14 +47,20 @@ public class TestModel implements Parcelable{
         } else {
             dest.writeFloat(duration);
         }
+
     }
 
     public enum TestType {
+        NOT_SET(0),
         DPOAE(1),
         TEOAE(2);
 
         private int value;
         private static Map map = new HashMap<>();
+
+        TestType(){
+            this.value = 0;
+        }
 
         TestType(int value){
             this.value = value;
@@ -76,26 +82,38 @@ public class TestModel implements Parcelable{
     }
 
     public enum Ear{
-        LEFT, RIGHT
+        NOT_SET, LEFT, RIGHT
     }
 
     public enum PassFail{
-        PASS, FAIL
+        NOT_SET, PASS, FAIL
     }
 
-    private Integer patient_ID;
-    private Integer test_ID;
+    private Context context;
+    private int patient_ID;
+    private int test_ID;
     private TestType test_type;
     private Ear ear;
     private PassFail pass_fail;
     private String comment;
     private Float duration;
+    public SettingsModel settings;
 
     //constructors
-    public TestModel(){
+    public TestModel(Context context){
+        this.context = context;
+        this.patient_ID = 0;
+        this.test_ID = 0;
+        this.test_type = TestType.NOT_SET;
+        this.ear = Ear.NOT_SET;
+        this.pass_fail = PassFail.NOT_SET;
+        this.comment = new String();
+        this.duration = new Float(0);
+        this.settings =  new SettingsModel(context);
     }
 
     public TestModel(Parcel in) {
+        //adding testmodel to settingshelpers stuff
         this.patient_ID = in.readInt();
         this.test_ID = in.readInt();
         this.test_type = TestType.valueOf(in.readString());
@@ -142,10 +160,13 @@ public class TestModel implements Parcelable{
     }
 
     public void setComment(String comment) {
+        if(this.comment == null) this.comment = new String();
+
         this.comment = comment;
     }
 
     public void setDuration(Float duration) {
+        if(this.duration == null) this.duration = new Float(0);
         this.duration = duration;
     }
 
@@ -176,6 +197,10 @@ public class TestModel implements Parcelable{
 
     public Float getDuration() {
         return duration;
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     public void sendTest(Context context, Tag tag){

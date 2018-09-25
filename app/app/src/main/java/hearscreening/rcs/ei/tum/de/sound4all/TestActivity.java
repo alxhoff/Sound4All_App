@@ -28,7 +28,7 @@ import java.util.List;
 
 import hearscreening.rcs.ei.tum.de.sound4all.TestModel.TestType;
 
-import static hearscreening.rcs.ei.tum.de.sound4all.NFCHelper.RECORD_IDS.PATIENT_ID;
+import static hearscreening.rcs.ei.tum.de.sound4all.TestModel.TestType.DPOAE;
 
 public class TestActivity extends AppCompatActivity {
 
@@ -52,7 +52,7 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         nfcHelper = new NFCHelper(TestActivity.this);
 
-        test = new TestModel();
+        test = new TestModel(this);
 
         databaseHelper = new DatabaseHelper(this);
 
@@ -76,7 +76,7 @@ public class TestActivity extends AppCompatActivity {
         switch(test_type){
             case 1:
                 getSupportActionBar().setTitle(getResources().getString(R.string.d_test) + " Test");
-                test.setTest_type(TestType.DPOAE);
+                test.setTest_type(DPOAE);
                 DPOAEtest = new DPOAETestModel();
                 break;
             case 2:
@@ -136,13 +136,35 @@ public class TestActivity extends AppCompatActivity {
                     //same patient - update local ID
                     patient.setID(patient_ID_in_DB);
                 }
-                //check if tag contains test data
-                if(nfcHelper.containsTests(nfcHelper.msgs)){
-                    //store data etc
-                }
-                if(nfcHelper.containsTestsConfig(nfcHelper.msgs)){
+
+                if(nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE)){
                     //handle stored test configs
+                   nfcHelper.getTestConfig(test, this);
+
+                    //TODO
+                    //get test type specific config info
+                    if(test.settings != null){
+                        switch(test.getTest_type()){
+                            case DPOAE:
+                                if(nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE))
+                                    if(DPOAEtest != null)
+                                        nfcHelper.getDPConfig(DPOAETestModel);
+                                break;
+                            case TEOAE:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    //check if tag contains test data
+                    if(nfcHelper.containsTests(nfcHelper.msgs)){
+                        //store data etc
+
+                    }
                 }
+
+
             }
             //send test config
             TestModel.TestType test_type = test.getTest_type();
@@ -153,7 +175,7 @@ public class TestActivity extends AppCompatActivity {
             switch(test_type){
                 case DPOAE:
                     compiled_settings = settingsHelper.compileSettings(
-                            TestType.DPOAE);
+                            DPOAE);
                     break;
                 case TEOAE:
                     compiled_settings = settingsHelper.compileSettings(
@@ -284,40 +306,6 @@ public class TestActivity extends AppCompatActivity {
                         default:
                             break;
                     }
-//                    if (msgs[i].getRecords()[j].getId()[0] == PATIENT_ID.getValue()) { //ndef contains a patient
-//                        byte[] payload = msgs[i].getRecords()[j].getPayload();
-//                        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16";
-//                        int languageCodeLength = payload[0] & 0063;
-//                        try {
-//                            //ID of patient on TAG
-//                            String patient_ID_string = new String(payload, languageCodeLength + 1,
-//                                    payload.length - languageCodeLength - 2, textEncoding);
-//                            String compare_string = patient.getID().toString();
-//
-//                            //patient has same ID?
-//                            if (patient_ID_string.equals(patient.getID().toString())) {
-//                                //same ID
-//                                DatabaseHelper databaseHelper = new DatabaseHelper(this);
-//                                //get current patient from DB with ID of patient on tag
-//                                PatientModel patient_at_tag_ID =
-//                                        databaseHelper.getPatientByID(patient_ID_string);
-//
-//                                //check patient is the same as the one stored in DB at tag ID
-//                                if(databaseHelper.samePatient(patient, patient_at_tag_ID))
-//                                    return false;
-//
-//                                //check patient doesn't exist with different ID
-//                                if(databaseHelper.checkPatientExists(patient_at_tag_ID))
-//                            }
-//                            else
-//                                //different ID
-//                                //check patient doesn't exist under different ID
-//
-//                                return true;
-//                        } catch (UnsupportedEncodingException e) {
-//                            Log.e("UnsupportedEncoding", e.toString());
-//                        }
-//                    }
                 }
             }
         }

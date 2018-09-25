@@ -38,8 +38,10 @@ public class NFCHelper {
         HEIGHT(5),
         WEIGHT(6),
         COMPILED_CONFIG(7),
-        TE_DATA(8),
-        DP_DATA(9);
+        TE_CONFIG(8),
+        DP_CONFIG(9),
+        TE_DATA(10),
+        DP_DATA(11);
 
         private int value;
         private static Map map = new HashMap<>();
@@ -331,9 +333,6 @@ public class NFCHelper {
 //        Toast.makeText((Activity)this.context, "Contents: " + text, Toast.LENGTH_LONG).show();
 //    }
 
-    public NFCHelper.RECORD_IDS getRecordID(NdefRecord record){
-        return NFCHelper.RECORD_IDS.valueOf(record.getId()[0]);
-    }
 
     public String getRecordText(NdefRecord record){
         String return_text = "";
@@ -352,6 +351,119 @@ public class NFCHelper {
         }
 
         return return_text;
+    }
+
+    public void getTestConfig(TestModel test, Context context){
+        //find message and record containing config info
+        if(test == null) test = new TestModel(context);
+
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+        NdefRecord test_config_record = null;
+
+        for(int i = 0; i < this.msgs.length; i ++){
+            NdefRecord[] records = msgs[i].getRecords();
+            for(int j = 0; j < records.length; j++){
+                record_id = getRecordID(records[j]);
+
+                if(record_id == RECORD_IDS.COMPILED_CONFIG) {
+                    test_config_record = records[j];
+                    //TODO neaten this VVV
+                    break;
+                }
+            }
+        }
+
+        //get payload
+        byte[] payload = test_config_record.getPayload();
+
+        if(payload != null){
+            //decode settings bytes
+            //first byte: test type
+            if(payload[0] == TestModel.TestType.DPOAE.getTestType())
+                test.setTest_type(TestModel.TestType.DPOAE);
+            else
+                test.setTest_type(TestModel.TestType.TEOAE);
+
+            //second byte: TE max duration
+            test.settings.setTE_max_duration(payload[1]);
+            //third byte: XX + 1 bit TE stimulus + 2 bit SNR + 3 bit TE num passes
+            test.settings.setTE_stimulus(SettingsModel.TE_STIMULUS.valueOf(
+                    (payload[2] & 0b00100000) >> 5));
+            test.settings.setTE_SNR(SettingsModel.SNR_dBs.valueOf(
+                    (payload[2] & 0b00011000) >> 3));
+            test.settings.setTE_num_of_passes((byte)(payload[2] & 0b00000111));
+            //fourth byte: TE stim level
+            test.settings.setTE_stim_lvl(payload[3]);
+            //fifth byte: DP max duration
+            test.settings.setDP_max_duration(payload[4]);
+            //sixth byte: XXX + 2 bit DP SNR + 3 bit DP num passes
+            test.settings.setDP_SNR(SettingsModel.SNR_dBs.valueOf(
+                    (payload[5] & 0b00011000) >> 3));
+            test.settings.setDP_num_of_passes((byte)(payload[5] & 0b00000111));
+            //7 - 10: DP threshold
+            test.settings.setDP_threshold(combineBytesToFloat(
+                    payload[6], payload[7], payload[8], payload[9]
+            ));
+            //11 - 14: DP f1
+            test.settings.setDP_f1(combineBytesToFloat(
+                    payload[10], payload[11], payload[12], payload[13]
+            ));
+            //15 - 18: DP l1
+            test.settings.setDP_l1(combineBytesToFloat(
+                    payload[14], payload[15], payload[16], payload[17]
+            ));
+            //19 - 22: DP l2
+            test.settings.setDP_l2(combineBytesToFloat(
+                    payload[18], payload[19], payload[20], payload[21]
+            ));
+        }
+    }
+
+    public void getDPConfig(DPOAETestModel test){
+        if(test == null) test = new DPOAETestModel();
+
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+        NdefRecord test_config_record = null;
+
+        for(int i = 0; i < this.msgs.length; i ++){
+            NdefRecord[] records = msgs[i].getRecords();
+            for(int j = 0; j < records.length; j++){
+                record_id = getRecordID(records[j]);
+
+                if(record_id == RECORD_IDS.DP_CONFIG) {
+                    test_config_record = records[j];
+                    //TODO neaten this VVV
+                    break;
+                }
+            }
+        }
+    }
+
+    public void getTEConfig(TEOAETestModel test){
+        if(test == null) test = new TEOAETestModel();
+
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+        NdefRecord test_config_record = null;
+
+        for(int i = 0; i < this.msgs.length; i ++){
+            NdefRecord[] records = msgs[i].getRecords();
+            for(int j = 0; j < records.length; j++){
+                record_id = getRecordID(records[j]);
+
+                if(record_id == RECORD_IDS.TE_CONFIG) {
+                    test_config_record = records[j];
+                    //TODO neaten this VVV
+                    break;
+                }
+            }
+        }
+    }
+
+    //TODO does this exsist in java
+    //TODO check byte order
+    private float combineBytesToFloat(byte MSByte, byte middleMSByte, byte middleLSByte,
+                                      byte LSByte){
+        return new Float( LSByte | (middleLSByte << 8) | (middleMSByte << 16) | (MSByte << 24));
     }
 
     /******************************************************************************
@@ -425,47 +537,67 @@ public class NFCHelper {
 
         for(int i = 0; i < msgs.length; i++){
             NdefRecord[] records = msgs[i].getRecords();
-            for(int j = 0; j < msgs[i].getRecords().length; j++){
-                byte[] record_id_byte = null;
+            for(int j = 0; j < records.length; j++){
 
-                if(msgs[i].getRecords().length > 0)
-                    record_id_byte = records[j].getId();
-                else break;
-
-                if(record_id_byte.length > 0)
-                    record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
-                else break;
+                record_id = getRecordID(records[j]);
 
                 if(record_id == RECORD_IDS.TE_DATA  || record_id == RECORD_IDS.DP_DATA)
                     return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsTestsConfig(NdefMessage[] msgs, TestModel.TestType dpoae){
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+
+        for(int i = 0; i < msgs.length; i++){
+            NdefRecord[] records = msgs[i].getRecords();
+            for(int j = 0; j < records.length; j++){
+
+                record_id = getRecordID(records[j]);
+
+                if(record_id == RECORD_IDS.COMPILED_CONFIG)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsTestTypeConfig(NdefMessage[] msgs, TestModel.TestType test_type){
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+
+        for(int i = 0; i < msgs.length; i++){
+            NdefRecord[] records = msgs[i].getRecords();
+            for(int j = 0; j < records.length; j++){
+                record_id = getRecordID(records[j]);
+
+                switch (test_type){
+                    case TEOAE:
+                        if(record_id == RECORD_IDS.TE_CONFIG)
+                            return true;
+                        else return false;
+                    case DPOAE:
+                        if(record_id == RECORD_IDS.DP_CONFIG)
+                            return true;
+                        else return false;
+                    default: return false;
+                }
             }
         }
 
         return false;
     }
 
-    public boolean containsTestsConfig(NdefMessage[] msgs){
-        RECORD_IDS record_id = RECORD_IDS.NONE;
+    private RECORD_IDS getRecordID(NdefRecord record){
+        byte[] record_id_byte;
 
-        for(int i = 0; i < msgs.length; i++){
-            NdefRecord[] records = msgs[i].getRecords();
-            for(int j = 0; j < msgs[i].getRecords().length; j++){
-                byte[] record_id_byte = null;
+        record_id_byte = record.getId();
 
-                if(msgs[i].getRecords().length > 0)
-                    record_id_byte = records[j].getId();
-                else break;
+        if(record_id_byte.length > 0)
+            return NFCHelper.RECORD_IDS.valueOf(record_id_byte[0]);
 
-                if(record_id_byte.length > 0)
-                    record_id = NFCHelper.RECORD_IDS.valueOf(msgs[i].getRecords()[j].getId()[0]);
-                else break;
-
-                if(record_id == RECORD_IDS.COMPILED_CONFIG)
-                    return true;
-            }
-        }
-
-        return false;
+        else return RECORD_IDS.NONE;
     }
 
     public void storeNewDPOAETest(NdefMessage msg){

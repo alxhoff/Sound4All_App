@@ -1,5 +1,7 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
+import android.content.Context;
+
 import junit.framework.Test;
 
 import java.util.Date;
@@ -9,7 +11,7 @@ public class DPOAETestModel extends TestModel{
     //DP TESTS TABLE
     private Float ratio;
     private Float threshold;
-    private Float maximum_duration;
+    private int maximum_duration;
 
     private Float noise;
     private Float DP_level;
@@ -17,7 +19,15 @@ public class DPOAETestModel extends TestModel{
     private Float l1;
     private Float l2;
 
-    public DPOAETestModel(){
+    public DPOAETestModel(Context context){
+
+        this.ratio = new Float(0);
+        this.threshold = new Float(0);
+        this.noise = new Float(0);
+        this.DP_level = new Float(0);
+        this.f1 = new Float(0);
+        this.l1 = new Float(0);
+        this.l2 = new Float(0);
     }
 
     public void setDP_level(Float DP_level) {
@@ -36,7 +46,7 @@ public class DPOAETestModel extends TestModel{
         this.l2 = l2;
     }
 
-    public void setMaximum_duration(Float maximum_duration) {
+    public void setMaximum_duration(int maximum_duration) {
         this.maximum_duration = maximum_duration;
     }
 
@@ -68,7 +78,7 @@ public class DPOAETestModel extends TestModel{
         return l2;
     }
 
-    public Float getMaximumDuration() {
+    public int getMaximumDuration() {
         return maximum_duration;
     }
 

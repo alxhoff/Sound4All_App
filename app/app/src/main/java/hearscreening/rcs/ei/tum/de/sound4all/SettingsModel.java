@@ -125,8 +125,8 @@ public class SettingsModel {
 
     //compiled config bits
     // 8 bit: Max dur TODO can be changed!
-    // 3 bit: Num of passes - i+1
     // 2 bit: SNR - 0=3, 1=6, 2=9, 3=12
+    // 3 bit: Num of passes - i+1
     // 8 bit: DP_freqs, bool flags MSB=1, LSB=8
     // 32 bit: F1
     // 32 bit: L1
