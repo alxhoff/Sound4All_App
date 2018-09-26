@@ -1,13 +1,19 @@
 package hearscreening.rcs.ei.tum.de.sound4all;
 
+import android.content.Context;
+
 public class TEOAETestModel extends TestModel{
 
     private String file_name;
     private Float duration;
     private Integer stimulation_level;
-    private Float maxiimum_duration;
+    private int maximum_duration;
+    private int data_length;
 
-    public TEOAETestModel(){
+    public TEOAETestModel(Context context){
+        super(context);
+        this.file_name = new String();
+        this.duration = new Float(0);
     }
 
     public void setDuration(Float duration) {
@@ -18,20 +24,28 @@ public class TEOAETestModel extends TestModel{
         this.file_name = file_name;
     }
 
-    public void setMaxiimum_duration(Float maxiimum_duration) {
-        this.maxiimum_duration = maxiimum_duration;
+    public void setMaximum_duration(int maximum_duration) {
+        this.maximum_duration = maximum_duration;
     }
 
     public void setStimulation_level(Integer stimulation_level) {
         this.stimulation_level = stimulation_level;
     }
 
+    public void setData_length(int data_length){
+        this.data_length = data_length;
+    }
+
+    public int getData_length() {
+        return this.data_length;
+    }
+
     public Float getDuration() {
         return duration;
     }
 
-    public Float getMaximumDuration() {
-        return maxiimum_duration;
+    public int getMaximumDuration() {
+        return maximum_duration;
     }
 
     public Integer getStimulationLevel() {

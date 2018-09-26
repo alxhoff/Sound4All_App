@@ -19,8 +19,10 @@ public class DPOAETestModel extends TestModel{
     private Float l1;
     private Float l2;
 
-    public DPOAETestModel(Context context){
+    private int data_length;
 
+    public DPOAETestModel(Context context){
+        super(context);
         this.ratio = new Float(0);
         this.threshold = new Float(0);
         this.noise = new Float(0);
@@ -60,6 +62,14 @@ public class DPOAETestModel extends TestModel{
 
     public void setThreshold(Float threshold) {
         this.threshold = threshold;
+    }
+
+    public void setData_length(int data_length){
+        this.data_length = data_length;
+    }
+
+    public int getData_length() {
+        return this.data_length;
     }
 
     public Float getDP_level() {

@@ -77,12 +77,12 @@ public class TestActivity extends AppCompatActivity {
             case 1:
                 getSupportActionBar().setTitle(getResources().getString(R.string.d_test) + " Test");
                 test.setTest_type(DPOAE);
-                DPOAEtest = new DPOAETestModel();
+                DPOAEtest = new DPOAETestModel(this);
                 break;
             case 2:
                 getSupportActionBar().setTitle(getResources().getString(R.string.t_test) + " Test");
                 test.setTest_type(TestType.TEOAE);
-                TEOAEtest = new TEOAETestModel();
+                TEOAEtest = new TEOAETestModel(this);
                 break;
         }
 
@@ -148,9 +148,11 @@ public class TestActivity extends AppCompatActivity {
                             case DPOAE:
                                 if(nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE))
                                     if(DPOAEtest != null)
-                                        nfcHelper.getDPConfig(DPOAETestModel);
+                                        nfcHelper.getDPConfig(DPOAEtest);
                                 break;
                             case TEOAE:
+                                    if(TEOAEtest != null)
+                                        nfcHelper.getTEConfig(TEOAEtest);
                                 break;
                             default:
                                 break;
@@ -160,7 +162,16 @@ public class TestActivity extends AppCompatActivity {
                     //check if tag contains test data
                     if(nfcHelper.containsTests(nfcHelper.msgs)){
                         //store data etc
-
+                        //TODO
+                        byte[] test_data;
+                        switch(test.getTest_type()){
+                            case DPOAE:
+                                test_data = nfcHelper.getDPData(DPOAEtest);
+                                break;
+                            case TEOAE:
+                                test_data = nfcHelper.getTEData(TEOAEtest);
+                                break;
+                        }
                     }
                 }
 

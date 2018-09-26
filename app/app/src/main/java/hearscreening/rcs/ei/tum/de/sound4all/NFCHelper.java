@@ -69,10 +69,6 @@ public class NFCHelper {
         public void setValue(int value){
             this.value = value;
         }
-//
-//        public void setValue(RECORD_IDS value){
-//            this.value = value;
-//        }
 
     }
 
@@ -295,44 +291,6 @@ public class NFCHelper {
     /******************************************************************************
      **************************************Read************************************
      ******************************************************************************/
-//    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
-//    public void readFromIntent(Intent intent){
-//        String action = intent.getAction();
-//        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-//                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
-//                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)){
-//            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-//            NdefMessage[] msgs = null;
-//            if(rawMsgs != null){
-//                msgs = new NdefMessage[rawMsgs.length];
-//                for(int i = 0; i < rawMsgs.length; i++){
-//                    msgs[i] = (NdefMessage)rawMsgs[i];
-//                }
-//            }
-//            buildTagViews(msgs);
-//        }
-//    }
-//
-//    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
-//    private void buildTagViews(NdefMessage[] msgs) {
-//        if (msgs == null || msgs.length == 0) return;
-//        String text = "";
-////        String tagId = new String(msgs[0].getRecords()[0].getType());
-//        byte[] payload = msgs[0].getRecords()[0].getPayload();
-//        String textEncoding = ((payload[0] & 128) == 0) ? "UTF-8" : "UTF-16"; // Get the Text Encoding
-//        int languageCodeLength = payload[0] & 0063; // Get the Language Code, e.g. "en"
-//        // String languageCode = new String(payload, 1, languageCodeLength, "US-ASCII");
-//
-//        try {
-//            // Get the Text
-//            text = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1, textEncoding);
-//        } catch (UnsupportedEncodingException e) {
-//            Log.e("UnsupportedEncoding", e.toString());
-//        }
-//        //handle text here!
-//        Toast.makeText((Activity)this.context, "Contents: " + text, Toast.LENGTH_LONG).show();
-//    }
-
 
     public String getRecordText(NdefRecord record){
         String return_text = "";
@@ -419,44 +377,67 @@ public class NFCHelper {
         }
     }
 
-    public void getDPConfig(DPOAETestModel test){
-        if(test == null) test = new DPOAETestModel();
-
-        RECORD_IDS record_id = RECORD_IDS.NONE;
-        NdefRecord test_config_record = null;
-
-        for(int i = 0; i < this.msgs.length; i ++){
-            NdefRecord[] records = msgs[i].getRecords();
-            for(int j = 0; j < records.length; j++){
-                record_id = getRecordID(records[j]);
-
-                if(record_id == RECORD_IDS.DP_CONFIG) {
-                    test_config_record = records[j];
-                    //TODO neaten this VVV
-                    break;
-                }
+    private NdefRecord seekAndReturnRecord(NdefMessage[] msgs, NFCHelper.RECORD_IDS record_id){
+        for(int i = 0; i < msgs.length; i++){
+            NdefRecord[] tmp_records = msgs[i].getRecords();
+            for(int j = 0; j < tmp_records.length; j++){
+                if(getRecordID(tmp_records[j]) == record_id)
+                    return tmp_records[j];
             }
         }
+
+        return null;
+    }
+
+    public void getDPConfig(DPOAETestModel test){
+        if(test == null) test = new DPOAETestModel(this.context);
+
+        RECORD_IDS record_id = RECORD_IDS.NONE;
+        NdefRecord test_config_record = seekAndReturnRecord(this.msgs, RECORD_IDS.DP_CONFIG);
+
+        //process record and get config
+        //TODO
+
+
+        //TODO list
+        //enncode and decode DP and TE test configs
     }
 
     public void getTEConfig(TEOAETestModel test){
-        if(test == null) test = new TEOAETestModel();
+        if(test == null) test = new TEOAETestModel(this.context);
 
         RECORD_IDS record_id = RECORD_IDS.NONE;
-        NdefRecord test_config_record = null;
+        NdefRecord test_config_record = seekAndReturnRecord(this.msgs, RECORD_IDS.TE_CONFIG);
 
-        for(int i = 0; i < this.msgs.length; i ++){
-            NdefRecord[] records = msgs[i].getRecords();
-            for(int j = 0; j < records.length; j++){
-                record_id = getRecordID(records[j]);
 
-                if(record_id == RECORD_IDS.TE_CONFIG) {
-                    test_config_record = records[j];
-                    //TODO neaten this VVV
-                    break;
-                }
-            }
-        }
+        //process record and get config
+        //TODO
+    }
+
+    public byte[] getDPData(DPOAETestModel test_config){
+        if(test_config == null) return null;
+
+        NdefRecord data_record = seekAndReturnRecord(this.msgs, RECORD_IDS.DP_DATA);
+
+        byte[] data = new byte[test_config.getData_length()];
+
+        //process record
+        //TODO
+
+        return data;
+    }
+
+    public byte[] getTEData(TEOAETestModel test_config){
+        if(test_config == null) return null;
+
+        NdefRecord data_record = seekAndReturnRecord(this.msgs, RECORD_IDS.TE_DATA);
+
+        byte[] data = new byte[test_config.getData_length()];
+
+        //process record
+        //TODO
+
+        return data;
     }
 
     //TODO does this exsist in java
