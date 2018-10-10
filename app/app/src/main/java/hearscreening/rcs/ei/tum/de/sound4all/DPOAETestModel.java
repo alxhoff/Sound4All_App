@@ -4,7 +4,9 @@ import android.content.Context;
 
 import junit.framework.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class DPOAETestModel extends TestModel{
 
@@ -102,5 +104,40 @@ public class DPOAETestModel extends TestModel{
 
     public Float getThreshold() {
         return threshold;
+    }
+
+    public List<Byte> compileSettings(){
+        SettingsHelper settingsHelper = new SettingsHelper(this.getContext());
+
+        List<Byte> compiled_settings = new ArrayList<Byte>();
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getRatio()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getThreshold()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitInt(this.getMaximumDuration()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getNoise()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getDP_level()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getF1()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getL1()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitFloat(this.getL2()));
+
+        settingsHelper.addByteArray(compiled_settings,
+                settingsHelper.splitInt(this.getData_length()));
+
+        return compiled_settings;
     }
 }

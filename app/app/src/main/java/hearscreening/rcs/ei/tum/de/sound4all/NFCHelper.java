@@ -17,6 +17,7 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -302,7 +303,7 @@ public class NFCHelper {
             try {
                 // Get the Text
                 return_text = new String(payload, languageCodeLength + 1,
-                        payload.length - languageCodeLength - 2, textEncoding);
+                        payload.length - languageCodeLength - 1, textEncoding);
             } catch (UnsupportedEncodingException e) {
                 Log.e("UnsupportedEncoding", e.toString());
             }
@@ -484,7 +485,8 @@ public class NFCHelper {
                 tmp_value = getRecordText(msg.getRecords()[i]);
                 switch(tmp_id){
                     case PATIENT_ID:
-                        tmp_patient.setID(Integer.parseInt(tmp_value));
+                        tmp_patient.setID(StringUtils.isNotBlank(tmp_value) ?
+                                Integer.parseInt(tmp_value) : 0 );
                         break;
                     case FAMILY_NAME:
                         tmp_patient.setFamilyName(tmp_value);
@@ -496,10 +498,12 @@ public class NFCHelper {
                         tmp_patient.setDob(tmp_value);
                         break;
                     case HEIGHT:
-                        tmp_patient.setHeight(Integer.parseInt(tmp_value));
+                        tmp_patient.setHeight(StringUtils.isNotBlank(tmp_value) ?
+                                Integer.parseInt(tmp_value) : 0 );
                         break;
                     case WEIGHT:
-                        tmp_patient.setWeight(Integer.parseInt(tmp_value));
+                        tmp_patient.setWeight(StringUtils.isNotBlank(tmp_value) ?
+                                Integer.parseInt(tmp_value) : 0 );
                         break;
                     default:
                         break;
@@ -588,4 +592,5 @@ public class NFCHelper {
     public void soreNewTEOAETest(NdefMessage msg){
 
     }
+
 }

@@ -161,8 +161,7 @@ public class TestActivity extends AppCompatActivity {
 
                     //check if tag contains test data
                     if(nfcHelper.containsTests(nfcHelper.msgs)){
-                        //store data etc
-                        //TODO
+                        //store data TODO
                         byte[] test_data;
                         switch(test.getTest_type()){
                             case DPOAE:
@@ -196,11 +195,11 @@ public class TestActivity extends AppCompatActivity {
                     break;
             }
             //prepare data for tag
+            nfcHelper.clearRecords();
             //add patient
             if(patient != null)
                 nfcHelper.addPatientRecords(patient);
             //send compiled settings
-            //HERE
             if(compiled_settings != null)
                 nfcHelper.addSettingsRecord(compiled_settings, NFCHelper.RECORD_IDS.COMPILED_CONFIG);
 

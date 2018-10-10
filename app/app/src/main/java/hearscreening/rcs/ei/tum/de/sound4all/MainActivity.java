@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                         et_given_name.getText().toString(), tv_date.getText().toString(),
                         et_height.getText().toString(), et_weight.getText().toString()});
                 if(fields_populated) {
-                    PatientModel new_patient = new PatientModel(null,
+                    PatientModel new_patient = new PatientModel(0,
                             et_family_name.getText().toString(),
                             et_given_name.getText().toString(),
                             tv_date.getText().toString(),

@@ -27,12 +27,12 @@ public class PatientModel implements Parcelable{
         this.context = context;
     }
 
-    public PatientModel(Integer ID){
+    public PatientModel(int ID){
         this.ID = ID;
     }
 
-    public PatientModel(Integer ID, String family_name, String given_name, String dob,
-                        Integer height_, Integer weight){
+    public PatientModel(int ID, String family_name, String given_name, String dob,
+                        int height_, int weight){
         this.ID = ID;
         this.family_name = family_name;
         this.given_name = given_name;
@@ -64,7 +64,7 @@ public class PatientModel implements Parcelable{
         }
     };
 
-    public void setID(Integer ID){
+    public void setID(int ID){
         this.ID = ID;
     }
 
@@ -80,11 +80,11 @@ public class PatientModel implements Parcelable{
         this.dob = dob;
     }
 
-    public void setHeight(Integer _height){
+    public void setHeight(int _height){
         this._height = _height;
     }
 
-    public void setWeight(Integer weight){
+    public void setWeight(int weight){
         this.weight = weight;
     }
 

@@ -226,8 +226,6 @@ public class PatientListActivity extends AppCompatActivity {
             tr.setPadding(0,0,0,0);
             tr.setLayoutParams(trParams);
 
-
-
             tr.addView(tv);
             tr.addView(tv2);
             tr.addView(layPatient);

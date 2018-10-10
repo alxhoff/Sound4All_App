@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import junit.framework.Test;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +56,15 @@ public class SettingsHelper {
         myDb.updateSettings(this.settings);
     }
 
-    private byte[] splitFloat(float to_split){
+    public byte[] splitInt(int to_split){
+        ByteBuffer buff = ByteBuffer.allocate(4);
+
+        buff.putInt(to_split);
+
+        return buff.array();
+    }
+
+    public byte[] splitFloat(float to_split){
         byte[] ret = new byte[4];
         int tmp = Float.floatToRawIntBits(to_split);
         ret[3] = (byte)((Float.floatToRawIntBits(to_split) >> 24) & 0xFF);
@@ -66,7 +75,7 @@ public class SettingsHelper {
         return ret;
     }
 
-    private void addByteArray(List<Byte> list, byte[] array){
+    public void addByteArray(List<Byte> list, byte[] array){
         for(byte i = 0; i < array.length; i++)
             list.add(array[array.length - i - 1]);
     }
