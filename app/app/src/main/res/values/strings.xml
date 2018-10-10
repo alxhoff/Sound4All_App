@@ -112,4 +112,8 @@
 
     <string name="preferences_key">s4allsharedPrefsKey</string>
     <string name="active_settings_preset_key">s4allActiveSetPresetKey</string>
+
+    <string name="test_screen_title">Perform Test</string>
+    <string name="test_screen_instructions">Please insert device into ear to perform test</string>
+    <string name="test_screen_complete_button">Test Complete</string>
 </resources>

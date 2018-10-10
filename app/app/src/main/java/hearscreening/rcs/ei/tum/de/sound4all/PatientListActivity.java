@@ -30,6 +30,10 @@ public class PatientListActivity extends AppCompatActivity {
 
     FloatingActionButton add_patient_button;
 
+    @Override
+    public void onBackPressed()
+    {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

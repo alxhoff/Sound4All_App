@@ -32,10 +32,11 @@ import static hearscreening.rcs.ei.tum.de.sound4all.TestModel.TestType.DPOAE;
 
 public class TestActivity extends AppCompatActivity {
 
-    Dialog MyDialog;
-    Button hello;
-    Button close;
+    Button btn_complete;
+
     AlertDialog dialog;
+
+    Boolean config_sent;
 
     TestModel test;
     DPOAETestModel DPOAEtest;
@@ -55,6 +56,8 @@ public class TestActivity extends AppCompatActivity {
         test = new TestModel(this);
 
         databaseHelper = new DatabaseHelper(this);
+
+        config_sent = false;
 
         nfcHelper.nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if(nfcHelper.nfcAdapter == null){
@@ -102,7 +105,17 @@ public class TestActivity extends AppCompatActivity {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         dialog.show();
-        }
+
+        btn_complete = (Button)findViewById(R.id.test_screen_complete_button);
+
+        btn_complete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
+            }
+        });
+
+    }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
@@ -117,95 +130,107 @@ public class TestActivity extends AppCompatActivity {
             nfcHelper.rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
         }
         try {
-            //read device to see if existing test exists that does not exist in database
-            if(nfcHelper.rawMsgs != null){
-                nfcHelper.msgs = new NdefMessage[nfcHelper.rawMsgs.length];
-                for(int i = 0; i < nfcHelper.rawMsgs.length; i++){
-                    nfcHelper.msgs[i] = (NdefMessage) nfcHelper.rawMsgs[i];
-                }
-                //check if patient exists
-                int patient_ID_in_DB = isDifferentPatient(nfcHelper.msgs);
-                if(patient_ID_in_DB == 0) {
-                    //different patient
-                    //check patient exists and store if not
-                    nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
-                }else if(patient_ID_in_DB == -1){
-                    //empty tag/no patient
-                    patient_ID_in_DB = 0;
-                }else{
-                    //same patient - update local ID
-                    patient.setID(patient_ID_in_DB);
-                }
+            if(config_sent == false) {
+                //read device to see if existing test exists that does not exist in database
+                if (nfcHelper.rawMsgs != null) {
+                    nfcHelper.msgs = new NdefMessage[nfcHelper.rawMsgs.length];
+                    for (int i = 0; i < nfcHelper.rawMsgs.length; i++) {
+                        nfcHelper.msgs[i] = (NdefMessage) nfcHelper.rawMsgs[i];
+                    }
+                    //check if patient exists
+                    int patient_ID_in_DB = isDifferentPatient(nfcHelper.msgs);
+                    if (patient_ID_in_DB == 0) {
+                        //different patient
+                        //check patient exists and store if not
+                        nfcHelper.storeNewPatient(nfcHelper.msgs[0]);
+                    } else if (patient_ID_in_DB == -1) {
+                        //empty tag/no patient
+                        patient_ID_in_DB = 0;
+                    } else {
+                        //same patient - update local ID
+                        patient.setID(patient_ID_in_DB);
+                    }
 
-                if(nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE)){
-                    //handle stored test configs
-                   nfcHelper.getTestConfig(test, this);
+                    if (nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE)) {
+                        //handle stored test configs
+                        nfcHelper.getTestConfig(test, this);
 
-                    //TODO
-                    //get test type specific config info
-                    if(test.settings != null){
-                        switch(test.getTest_type()){
-                            case DPOAE:
-                                if(nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE))
-                                    if(DPOAEtest != null)
-                                        nfcHelper.getDPConfig(DPOAEtest);
-                                break;
-                            case TEOAE:
-                                    if(TEOAEtest != null)
+                        //TODO
+                        //get test type specific config info
+                        if (test.settings != null) {
+                            switch (test.getTest_type()) {
+                                case DPOAE:
+                                    if (nfcHelper.containsTestsConfig(nfcHelper.msgs, DPOAE))
+                                        if (DPOAEtest != null)
+                                            nfcHelper.getDPConfig(DPOAEtest);
+                                    break;
+                                case TEOAE:
+                                    if (TEOAEtest != null)
                                         nfcHelper.getTEConfig(TEOAEtest);
-                                break;
-                            default:
-                                break;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        //check if tag contains test data
+                        if (nfcHelper.containsTests(nfcHelper.msgs)) {
+                            //store data TODO
+                            byte[] test_data;
+                            switch (test.getTest_type()) {
+                                case DPOAE:
+                                    test_data = nfcHelper.getDPData(DPOAEtest);
+                                    break;
+                                case TEOAE:
+                                    test_data = nfcHelper.getTEData(TEOAEtest);
+                                    break;
+                            }
                         }
                     }
 
-                    //check if tag contains test data
-                    if(nfcHelper.containsTests(nfcHelper.msgs)){
-                        //store data TODO
-                        byte[] test_data;
-                        switch(test.getTest_type()){
-                            case DPOAE:
-                                test_data = nfcHelper.getDPData(DPOAEtest);
-                                break;
-                            case TEOAE:
-                                test_data = nfcHelper.getTEData(TEOAEtest);
-                                break;
-                        }
-                    }
+
                 }
+                //send test config
+                TestModel.TestType test_type = test.getTest_type();
+                //compile active settings
+                SettingsHelper settingsHelper = new SettingsHelper(this);
+                settingsHelper.actualizeSettingPreset();
+                List<Byte> compiled_settings = null;
+                switch (test_type) {
+                    case DPOAE:
+                        compiled_settings = settingsHelper.compileSettings(
+                                DPOAE);
+                        break;
+                    case TEOAE:
+                        compiled_settings = settingsHelper.compileSettings(
+                                TestType.TEOAE);
+                        break;
+                    default:
+                        break;
+                }
+                //prepare data for tag
+                nfcHelper.clearRecords();
+                //add patient
+                if (patient != null)
+                    nfcHelper.addPatientRecords(patient);
+                //send compiled settings
+                if (compiled_settings != null)
+                    nfcHelper.addSettingsRecord(compiled_settings, NFCHelper.RECORD_IDS.COMPILED_CONFIG);
 
+                nfcHelper.writeStoredRecords(nfcHelper.nfcTag);
 
+                config_sent = true;
+                dialog.dismiss();
+
+                //test now needs to be performed
+            }else{
+                Toast.makeText(this, "Handle received data",
+                        Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+                Intent returnToList = new Intent( TestActivity.this,
+                        PatientListActivity.class);
+                startActivity(returnToList);
             }
-            //send test config
-            TestModel.TestType test_type = test.getTest_type();
-            //compile active settings
-            SettingsHelper settingsHelper = new SettingsHelper(this);
-            settingsHelper.actualizeSettingPreset();
-            List<Byte> compiled_settings = null;
-            switch(test_type){
-                case DPOAE:
-                    compiled_settings = settingsHelper.compileSettings(
-                            DPOAE);
-                    break;
-                case TEOAE:
-                    compiled_settings = settingsHelper.compileSettings(
-                            TestType.TEOAE);
-                    break;
-                default:
-                    break;
-            }
-            //prepare data for tag
-            nfcHelper.clearRecords();
-            //add patient
-            if(patient != null)
-                nfcHelper.addPatientRecords(patient);
-            //send compiled settings
-            if(compiled_settings != null)
-                nfcHelper.addSettingsRecord(compiled_settings, NFCHelper.RECORD_IDS.COMPILED_CONFIG);
-
-            nfcHelper.writeStoredRecords(nfcHelper.nfcTag);
-
-            dialog.dismiss();
 
         } catch (IOException e) {
             e.printStackTrace();
